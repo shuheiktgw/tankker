@@ -1,0 +1,34 @@
+@(user: models.Tables.UsersRow)
+
+@main("ユーザー詳細") {
+
+    <div class="col-xs-6">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>UserName</th>
+                    <th>Email</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@user.id</td>
+                    <td><a href="@routes.UserController.edit">@user.username</a></td>
+                    <td>@user.email</td>
+                    <td>@helper.form(routes.UserController.delete) {
+                        <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
+                    }
+                    </td>
+                    <td>@helper.form(routes.UserController.delete) {
+                        <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
+                    }
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+}
+
