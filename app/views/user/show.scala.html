@@ -1,4 +1,4 @@
-@(user: models.Tables.UsersRow)
+@(user: models.Tables.UserRow)
 
 @main("ユーザー詳細") {
 
@@ -16,10 +16,10 @@
             <tbody>
                 <tr>
                     <td>@user.id</td>
-                    <td><a href="@routes.UserController.edit">@user.username</a></td>
+                    <td>@user.username</td>
                     <td>@user.email</td>
-                    <td>@helper.form(routes.UserController.delete) {
-                        <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
+                    <td>@helper.form(routes.UserController.edit) {
+                        <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
                     }
                     </td>
                     <td>@helper.form(routes.UserController.delete) {

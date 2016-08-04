@@ -30,7 +30,7 @@ trait AuthConfigImpl extends AuthConfig{
     * あなたのアプリケーションで認証するユーザを表す型です。
     * User型やAccount型など、アプリケーションに応じて設定してください。
     */
-  type User = Tables.UsersRow
+  type User = Tables.UserRow
 
   /**
     * 認可(権限チェック)を行う際に、アクション毎に設定するオブジェクトの型です。

@@ -10,7 +10,7 @@ import models.{Tables, UsersRepo, UsersRepoLike}
 import javax.inject.Inject
 
 import jp.t2v.lab.play2.auth.OptionalAuthElement
-import models.Tables.UsersRow
+import models.Tables.UserRow
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
@@ -54,7 +54,7 @@ class UserController @Inject()(val usersRepoLike: UsersRepoLike, val usersRepo: 
         Future(BadRequest(views.html.user.brandNew(userForm)))
       },
       form =>{
-        val user = UsersRow(0,form.username,form.email, form.password, false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
+        val user = UserRow(0,form.username,form.email,form.password,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
         usersRepo.add(user).map { _ =>
           Redirect(routes.UserController.show)
         }
@@ -84,7 +84,7 @@ class UserController @Inject()(val usersRepoLike: UsersRepoLike, val usersRepo: 
       },
       // TODO LoggedIn でユーザー同じか確認
       form =>{
-        val user = UsersRow(form.id.get.toInt,form.username,form.email, form.password, false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
+        val user = UserRow(form.id.get.toInt,form.username,form.email, form.password ,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
         // TODO usernameとemailが被ってた場合の処理を追加
         usersRepo.change(user).map { _ =>
           Redirect(routes.UserController.show)
