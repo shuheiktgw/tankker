@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import jp.t2v.lab.play2.auth.{AuthElement, LoginLogout}
-import models.{Tables, UsersRepo, UsersRepoLike}
+import models.{Tables, UserRepo, UserRepoLike}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -16,7 +16,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by shuhei.kitagawa on 2016/08/03.
   */
-class LoginController @Inject()(val usersRepoLike: UsersRepoLike, val usersRepo: UsersRepo, val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with AuthConfigImpl {
+class LoginController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: UserRepo, val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with AuthConfigImpl {
 
   // TODO UsersRepoLikeとUsersRepoの2つインポートするのダサいからどうにかしよう
   // TODO CSRF対策
@@ -28,11 +28,15 @@ class LoginController @Inject()(val usersRepoLike: UsersRepoLike, val usersRepo:
   }
 
 
-  def authenticate = Action.async { implicit rs =>
+  def create = Action.async { implicit rs =>
     loginForm.bindFromRequest.fold(
       error => Future.successful(BadRequest(views.html.login.login(loginForm))),
       user => gotoLoginSucceeded(user.username)
     )
+  }
+
+  def delete = Action.async{ implicit rs =>
+    gotoLogoutSucceeded
   }
 
   val loginForm = Form(
@@ -49,4 +53,6 @@ class LoginController @Inject()(val usersRepoLike: UsersRepoLike, val usersRepo:
 
 object LoginController{
   case class LoginForm(username: String, password: String)
+
+  impot 
 }

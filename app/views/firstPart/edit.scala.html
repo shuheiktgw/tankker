@@ -1,0 +1,28 @@
+@(firstPartForm: Form[controllers.FirstPartController.FirstPartForm])(implicit messages: Messages)
+
+@* テンプレートで利用可能なヘルパーをインポート *@
+@import helper._
+
+@main("上の句編集") {
+
+    @* IDがある場合は更新処理、ない場合は登録処理を呼ぶ *@
+    @form(routes.FirstPartController.update, 'class -> "container", 'role -> "form") {
+        <fieldset>
+            <div class="form-group">
+            @inputText(firstPartForm("firstPartContentFirst"), '_label -> "一句")
+            </div>
+            <div class="form-group">
+            @inputText(firstPartForm("firstPartContentSecond"), '_label -> "二句")
+            </div>
+            <div class="form-group">
+            @inputText(firstPartForm("firstPartContentThird"), '_label -> "二句")
+            </div>
+            <input type="hidden" name="id" value="@firstPartForm.get.id" />
+            <input type="hidden" name="userId" value="@firstPartForm.get.userId" />
+            <div>
+                <input type="submit" value="保存" class="btn btn-success">
+            </div>
+        </fieldset>
+    }
+
+}

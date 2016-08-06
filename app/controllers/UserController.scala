@@ -3,10 +3,11 @@ package controllers
 
 import java.sql.Timestamp
 
+import controllers.FirstPartController.firstPartForm
 import play.api.mvc._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.i18n.{I18nSupport, MessagesApi}
-import models.{Tables, UsersRepo, UsersRepoLike}
+import models.{FirstPartRepo, Tables, UserRepo, UserRepoLike}
 import javax.inject.Inject
 
 import jp.t2v.lab.play2.auth.OptionalAuthElement
@@ -21,7 +22,7 @@ import scala.concurrent.Future
 /**
   * Created by shuhei.kitagawa on 2016/08/02.
   */
-class UserController @Inject()(val usersRepoLike: UsersRepoLike, val usersRepo: UsersRepo, val messagesApi: MessagesApi) extends Controller with I18nSupport with OptionalAuthElement with AuthConfigImpl{
+class UserController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: UserRepo, val firstPartRepo: FirstPartRepo, val messagesApi: MessagesApi) extends Controller with I18nSupport with OptionalAuthElement with AuthConfigImpl{
 
   // TODO Admin権限に設定
   // TODO FLGがtrue のユーザーがログイン出来ないようにしなくてはいけない
@@ -32,12 +33,13 @@ class UserController @Inject()(val usersRepoLike: UsersRepoLike, val usersRepo: 
   }
 
   def show = AsyncStack { implicit rs =>
-    Future {
       loggedIn match {
-        case Some(user) => Ok(views.html.user.show(user))
+        case Some(user) =>
+          firstPartRepo.all(user.id).map{ firstPats =>
+            Ok(views.html.user.show(user, firstPartForm, firstPats))
+          }
         // TODO エラーページ作って遷移させたい
-        case _ => Redirect(routes.LoginController.brandNew)
-      }
+        case _ => Future(Redirect(routes.LoginController.brandNew))
     }
   }
 
@@ -48,6 +50,7 @@ class UserController @Inject()(val usersRepoLike: UsersRepoLike, val usersRepo: 
     Future(Ok(views.html.user.brandNew(userForm)))
   }
 
+  // TODO 新規作成ユーザーがすぐにログインできるようにしたい
   def create = AsyncStack{ implicit rs =>
     userForm.bindFromRequest.fold(
       error => {
@@ -55,13 +58,14 @@ class UserController @Inject()(val usersRepoLike: UsersRepoLike, val usersRepo: 
       },
       form =>{
         val user = UserRow(0,form.username,form.email,form.password,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
-        usersRepo.add(user).map { _ =>
+        usersRepo.add(user).map { userOp =>
           Redirect(routes.UserController.show)
         }
       }
     )
   }
 
+  // TODO ViewのほうがPOSTになってるので,Getに帰る
   def edit = AsyncStack { implicit rs =>
     Future{
       loggedIn match {

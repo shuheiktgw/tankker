@@ -1,8 +1,57 @@
-@(user: models.Tables.UserRow)
+@(user: models.Tables.UserRow, firstPartForm: Form[controllers.FirstPartController.FirstPartForm], firstParts: Seq[Tables.FirstPartRow])(implicit messages: Messages)
+@import helper._
 
 @main("ユーザー詳細") {
 
     <div class="col-xs-6">
+        @form(routes.FirstPartController.create) {
+            <fieldset>
+                <div class="form-group">
+                @inputText(firstPartForm("firstPartContentFirst"), '_label -> "初句")
+                </div>
+                <div class="form-group">
+                @inputText(firstPartForm("firstPartContentSecond"), '_label -> "二句")
+                </div>
+                <div class="form-group">
+                @inputText(firstPartForm("firstPartContentThird"), '_label -> "三句")
+                </div>
+                <input type="hidden" name="userId" value="@user.id" />
+                <div>
+                    <input type="submit" value="保存" class="btn btn-success">
+                </div>
+            </fieldset>
+        }
+
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>初句</th>
+                    <th>二句</th>
+                    <th>三句</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                @firstParts.map{ firstPart =>
+                    <tr>
+                        <td>@firstPart.firstPartContentFirst</td>
+                        <td>@firstPart.firstPartContentSecond</td>
+                        <td>@firstPart.firstPartContentThird</td>
+                        <td><a href="@routes.FirstPartController.edit(firstPart.id.toLong)">
+                            <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
+                        </a>
+                        </td>
+                        <td>@helper.form(routes.FirstPartController.delete(firstPart.id)) {
+                            <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
+                        }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
         <table class="table table-hover">
             <thead>
                 <tr>
@@ -29,6 +78,8 @@
                 </tr>
             </tbody>
         </table>
+
+        <a href="@routes.LoginController.delete">ログアウト</a>
     </div>
 }
 

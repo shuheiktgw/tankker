@@ -5,7 +5,7 @@
 
 @main("ログイン") {
 
-    @form(routes.LoginController.authenticate, 'class -> "container", 'role -> "form") {
+    @form(routes.LoginController.create, 'class -> "container", 'role -> "form") {
         <fieldset>
             <div class="form-group">
             @inputText(loginForm("username"), '_label -> "User Name")

@@ -6,7 +6,7 @@ import play.api.mvc.RequestHeader
 import play.api.mvc.Results._
 
 import scala.concurrent.{ExecutionContext, Future}
-import models.{Tables, UsersRepoLike}
+import models.{Tables, UserRepoLike}
 //import jp.t2v.lab.play2.auth.sample.{Role, Account}
 //import jp.t2v.lab.play2.auth.sample.Role._
 import scala.reflect.{ClassTag, classTag}
@@ -16,7 +16,7 @@ import scala.reflect.{ClassTag, classTag}
   */
 trait AuthConfigImpl extends AuthConfig{
 
-  val usersRepoLike: UsersRepoLike
+  val userRepoLike: UserRepoLike
 
   // TODO Admin機能の実装
   type Authority = None.type
@@ -56,7 +56,7 @@ trait AuthConfigImpl extends AuthConfig{
     * ユーザIDからUserブジェクトを取得するアルゴリズムを指定します。
     * 任意の処理を記述してください。
     */
-  def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] = usersRepoLike.findByUsername(id)
+  def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] = userRepoLike.findByUsername(id)
 
 
   /**

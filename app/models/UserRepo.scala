@@ -22,7 +22,7 @@ import com.github.t3hnar.bcrypt._
   * Created by shuhei.kitagawa on 2016/08/02.
   */
 
-class UsersRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] with UsersRepoLike{
+class UserRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] with UserRepoLike{
 
   val User = TableQuery[User]
 
@@ -106,8 +106,8 @@ class UsersRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends 
   }
 }
 
-@ImplementedBy(classOf[UsersRepo])
-trait UsersRepoLike{
+@ImplementedBy(classOf[UserRepo])
+trait UserRepoLike{
   def findByUsername(username: String): Future[Option[Tables.UserRow]]
   def authenticate(username: String, password: String): Option[Tables.UserRow]
 }
