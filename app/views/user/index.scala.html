@@ -1,6 +1,17 @@
-@(users: Seq[models.Tables.UserRow])
+@(users: Seq[models.Tables.UserRow])(implicit messages: Messages, flash: Flash)
 
 @main("ユーザ一覧") {
+    @flash.get("success").map { message =>
+        <div class="alert alert-success" role="alert">
+            @message
+        </div>
+    }
+
+    @flash.get("error").map { message =>
+        <div class="alert alert-danger" role="alert">
+            @message
+        </div>
+    }
 
     <div>
         <a href="@routes.UserController.brandNew()" class="btn btn-success" role="button">新規作成</a>

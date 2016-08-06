@@ -1,9 +1,20 @@
-@(loginForm: Form[controllers.LoginController.LoginForm])(implicit messages: Messages)
+@(loginForm: Form[controllers.LoginController.LoginForm])(implicit messages: Messages, flash: Flash)
 
 @* テンプレートで利用可能なヘルパーをインポート *@
 @import helper._
 
 @main("ログイン") {
+    @flash.get("success").map { message =>
+        <div class="alert alert-success" role="alert">
+            @message
+        </div>
+    }
+
+    @flash.get("error").map { message =>
+        <div class="alert alert-danger" role="alert">
+            @message
+        </div>
+    }
 
     @form(routes.LoginController.create, 'class -> "container", 'role -> "form") {
         <fieldset>

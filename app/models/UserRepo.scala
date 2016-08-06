@@ -17,6 +17,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import models.Tables.{User, UserRow}
 import com.github.t3hnar.bcrypt._
+import controllers.LoginController.LoginForm
 
 /**
   * Created by shuhei.kitagawa on 2016/08/02.
@@ -45,14 +46,6 @@ class UserRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends H
     }
   }
 
-//    userExists(user).map {
-//      case true => Option.empty[User]
-//        // TODO ここエラーが出る可能性が高いので修正
-//        // TODO Recoverでエラー処理する
-//      case _ => db.run(users += user).flatMap((_: Int) => Option(user))
-//    }
-
-
   def change(user: Tables.UserRow): Future[Option[Tables.UserRow]] = {
     if(userExists(user)){
       Future(Option.empty[Tables.UserRow])
@@ -75,15 +68,22 @@ class UserRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends H
       }
   }
 
-  // done addのBycriptも忘れずに
-  def authenticate(username: String, password: String): Option[Tables.UserRow] = {
-    val result: Future[Option[Tables.UserRow]] = findByUsername(username).map{
-      case Some(user) => if(password.isBcrypted(user.password)) Some(user) else Option.empty[Tables.UserRow]
+
+//  def authenticate(username: String, password: String): Option[Tables.UserRow] = {
+//    val result: Future[Option[Tables.UserRow]] = findByUsername(username).map{
+//      case Some(user) => if(password.isBcrypted(user.password)) Some(user) else Option.empty[Tables.UserRow]
+//      case None => Option.empty[Tables.UserRow]
+//    }
+//
+//    // TODO Awaitしない処理ないか確認
+//    Await.result(result, Duration.Inf)
+//  }
+
+  def authenticate(form: LoginForm): Future[Option[Tables.UserRow]] = {
+    findByUsername(form.username).map{
+      case Some(user) => if(form.password.isBcrypted(user.password)) Some(user) else Option.empty[Tables.UserRow]
       case None => Option.empty[Tables.UserRow]
     }
-
-    // TODO Awaitしない処理ないか確認
-    Await.result(result, Duration.Inf)
   }
 
   def findByEmail(email: String): Future[Option[Tables.UserRow]] ={
@@ -109,5 +109,5 @@ class UserRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends H
 @ImplementedBy(classOf[UserRepo])
 trait UserRepoLike{
   def findByUsername(username: String): Future[Option[Tables.UserRow]]
-  def authenticate(username: String, password: String): Option[Tables.UserRow]
+  def authenticate(form: LoginForm): Future[Option[Tables.UserRow]]
 }

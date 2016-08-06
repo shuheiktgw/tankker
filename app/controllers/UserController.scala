@@ -10,7 +10,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import models.{FirstPartRepo, Tables, UserRepo, UserRepoLike}
 import javax.inject.Inject
 
-import jp.t2v.lab.play2.auth.OptionalAuthElement
+import jp.t2v.lab.play2.auth.{LoginLogout, OptionalAuthElement}
 import models.Tables.UserRow
 import play.api.data.Form
 import play.api.data.Forms._
@@ -22,7 +22,7 @@ import scala.concurrent.Future
 /**
   * Created by shuhei.kitagawa on 2016/08/02.
   */
-class UserController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: UserRepo, val firstPartRepo: FirstPartRepo, val messagesApi: MessagesApi) extends Controller with I18nSupport with OptionalAuthElement with AuthConfigImpl{
+class UserController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: UserRepo, val firstPartRepo: FirstPartRepo, val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with OptionalAuthElement with AuthConfigImpl{
 
   // TODO Admin権限に設定
   // TODO FLGがtrue のユーザーがログイン出来ないようにしなくてはいけない
@@ -50,16 +50,15 @@ class UserController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: Us
     Future(Ok(views.html.user.brandNew(userForm)))
   }
 
-  // TODO 新規作成ユーザーがすぐにログインできるようにしたい
   def create = AsyncStack{ implicit rs =>
     userForm.bindFromRequest.fold(
       error => {
-        Future(BadRequest(views.html.user.brandNew(userForm)))
+        Future(BadRequest(views.html.user.brandNew(userForm)).flashing("error" -> "Goodbye bad boy..."))
       },
       form =>{
         val user = UserRow(0,form.username,form.email,form.password,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
-        usersRepo.add(user).map { userOp =>
-          Redirect(routes.UserController.show)
+        usersRepo.add(user).flatMap { userOp =>
+          gotoLoginSucceeded(user.username).map(_.flashing("success" -> "Welcome to Tankker!"))
         }
       }
     )
@@ -91,7 +90,7 @@ class UserController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: Us
         val user = UserRow(form.id.get.toInt,form.username,form.email, form.password ,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
         // TODO usernameとemailが被ってた場合の処理を追加
         usersRepo.change(user).map { _ =>
-          Redirect(routes.UserController.show)
+          Redirect(routes.UserController.show).flashing("success" -> "Your info has been successfully updated")
         }
       }
     )
@@ -103,7 +102,7 @@ class UserController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: Us
       case Some(user) => usersRepo.remove(user.id) map{
         // TODO 削除したユーザーの情報をFlashで表示
         // 削除する前に確認
-        case Some(user) => Redirect(routes.LoginController.brandNew)
+        case Some(user) => Redirect(routes.LoginController.brandNew).flashing("success" -> "You have been successfully withdrawn from Tankker")
         case None => Redirect(routes.LoginController.brandNew)
       }
     }

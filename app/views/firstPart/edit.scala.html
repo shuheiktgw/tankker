@@ -1,9 +1,20 @@
-@(firstPartForm: Form[controllers.FirstPartController.FirstPartForm])(implicit messages: Messages)
+@(firstPartForm: Form[controllers.FirstPartController.FirstPartForm])(implicit messages: Messages, flash: Flash)
 
 @* テンプレートで利用可能なヘルパーをインポート *@
 @import helper._
 
 @main("上の句編集") {
+    @flash.get("success").map { message =>
+        <div class="alert alert-success" role="alert">
+            @message
+        </div>
+    }
+
+    @flash.get("error").map { message =>
+        <div class="alert alert-danger" role="alert">
+            @message
+        </div>
+    }
 
     @* IDがある場合は更新処理、ない場合は登録処理を呼ぶ *@
     @form(routes.FirstPartController.update, 'class -> "container", 'role -> "form") {

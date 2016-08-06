@@ -1,7 +1,18 @@
-@(user: models.Tables.UserRow, firstPartForm: Form[controllers.FirstPartController.FirstPartForm], firstParts: Seq[Tables.FirstPartRow])(implicit messages: Messages)
+@(user: models.Tables.UserRow, firstPartForm: Form[controllers.FirstPartController.FirstPartForm], firstParts: Seq[Tables.FirstPartRow])(implicit messages: Messages, flash: Flash)
 @import helper._
 
 @main("ユーザー詳細") {
+    @flash.get("success").map { message =>
+        <div class="alert alert-success" role="alert">
+            @message
+        </div>
+    }
+
+    @flash.get("error").map { message =>
+        <div class="alert alert-danger" role="alert">
+            @message
+        </div>
+    }
 
     <div class="col-xs-6">
         @form(routes.FirstPartController.create) {
