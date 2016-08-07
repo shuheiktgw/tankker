@@ -80,7 +80,6 @@ class FirstPartController @Inject()(val firstPartRepo: FirstPartRepo,val userRep
             firstPartRepo.change(firstPart).map{
               firstPartOp => Redirect(routes.UserController.show).flashing("success" -> "Your tanka has been successfully updated!")
             }
-            // TODO リダイレクトはおかしい,レスポンスを返せるように,あとFlash表示
           }else{
             Future(Redirect(routes.UserController.show).flashing("error" -> "Goodbye bad boy..."))
           }

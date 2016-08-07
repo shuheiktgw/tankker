@@ -21,9 +21,13 @@ GET         /logout                 controllers.LoginController.delete
 
 #FirstPart
 POST        /tanka                  controllers.FirstPartController.create
-GET         /tanka/edit/:id          controllers.FirstPartController.edit(id:Long)
+GET         /tanka/edit/:id         controllers.FirstPartController.edit(id:Long)
 POST        /tanka/update           controllers.FirstPartController.update
 POST        /tanka/delete           controllers.FirstPartController.delete(id:Long)
+
+#LastPart
+GET         /henka/:id           controllers.LastPartController.brandNew(id:Long)
+POST        /henka/create        controllers.LastPartController.create(userId: Long, firstPartId: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
