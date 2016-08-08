@@ -15,6 +15,7 @@ import models.Tables.UserRow
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import services.TimelineService
 import slick.driver.JdbcProfile
 
 import scala.concurrent.Future
@@ -22,7 +23,7 @@ import scala.concurrent.Future
 /**
   * Created by shuhei.kitagawa on 2016/08/02.
   */
-class UserController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: UserRepo, val firstPartRepo: FirstPartRepo, val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with OptionalAuthElement with AuthConfigImpl{
+class UserController @Inject()(val timelineService: TimelineService, val userRepoLike: UserRepoLike, val usersRepo: UserRepo, val firstPartRepo: FirstPartRepo, val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with OptionalAuthElement with AuthConfigImpl{
 
   // TODO Admin権限に設定
   // TODO FLGがtrue のユーザーがログイン出来ないようにしなくてはいけない
@@ -35,9 +36,14 @@ class UserController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: Us
   def show = AsyncStack { implicit rs =>
       loggedIn match {
         case Some(user) =>
-          firstPartRepo.all(user.id).map{ firstPats =>
-            Ok(views.html.user.show(user, firstPartForm, firstPats))
+          timelineService.fetchTankaForTL(user.id).map{ tankas =>
+            Ok(views.html.user.show(user, firstPartForm, tankas))
+
+
           }
+//          firstPartRepo.findByUserId(user.id).map{ firstPats =>
+//            Ok(views.html.user.show(user, firstPartForm, firstPats))
+//          }
         // TODO エラーページ作って遷移させたい
         case _ => Future(Redirect(routes.LoginController.brandNew))
     }
