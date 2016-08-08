@@ -42,6 +42,7 @@
                     <th>三句</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
+                    <th>&nbsp;</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,6 +51,9 @@
                         <td>@firstPart.firstPartContentFirst</td>
                         <td>@firstPart.firstPartContentSecond</td>
                         <td>@firstPart.firstPartContentThird</td>
+                        <td><a href="@routes.LastPartController.brandNew(firstPart.id.toLong)">
+                            <input type="submit" value="返歌" class="btn btn-danger btn-xs"/>
+                        </a>
                         <td><a href="@routes.FirstPartController.edit(firstPart.id.toLong)">
                             <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
                         </a>
