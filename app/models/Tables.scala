@@ -14,7 +14,7 @@ trait Tables {
   import slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = FirstPart.schema ++ User.schema
+  lazy val schema: profile.SchemaDescription = FirstPart.schema ++ LastPart.schema ++ User.schema
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -58,6 +58,49 @@ trait Tables {
   }
   /** Collection-like TableQuery object for table FirstPart */
   lazy val FirstPart = new TableQuery(tag => new FirstPart(tag))
+
+  /** Entity class storing rows of table LastPart
+   *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
+   *  @param userId Database column user_id SqlType(INT)
+   *  @param firstPartId Database column first_part_id SqlType(INT)
+   *  @param lastPartContentFirst Database column last_part_content_first SqlType(VARCHAR), Length(28,true)
+   *  @param lastPartContentSecond Database column last_part_content_second SqlType(VARCHAR), Length(28,true)
+   *  @param createdAt Database column created_at SqlType(TIMESTAMP)
+   *  @param updatedAt Database column updated_at SqlType(TIMESTAMP) */
+  case class LastPartRow(id: Int, userId: Int, firstPartId: Int, lastPartContentFirst: String, lastPartContentSecond: String, createdAt: java.sql.Timestamp, updatedAt: java.sql.Timestamp)
+  /** GetResult implicit for fetching LastPartRow objects using plain SQL queries */
+  implicit def GetResultLastPartRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[LastPartRow] = GR{
+    prs => import prs._
+    LastPartRow.tupled((<<[Int], <<[Int], <<[Int], <<[String], <<[String], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
+  }
+  /** Table description of table LAST_PART. Objects of this class serve as prototypes for rows in queries. */
+  class LastPart(_tableTag: Tag) extends Table[LastPartRow](_tableTag, "LAST_PART") {
+    def * = (id, userId, firstPartId, lastPartContentFirst, lastPartContentSecond, createdAt, updatedAt) <> (LastPartRow.tupled, LastPartRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(id), Rep.Some(userId), Rep.Some(firstPartId), Rep.Some(lastPartContentFirst), Rep.Some(lastPartContentSecond), Rep.Some(createdAt), Rep.Some(updatedAt)).shaped.<>({r=>import r._; _1.map(_=> LastPartRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column id SqlType(INT), AutoInc, PrimaryKey */
+    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column user_id SqlType(INT) */
+    val userId: Rep[Int] = column[Int]("user_id")
+    /** Database column first_part_id SqlType(INT) */
+    val firstPartId: Rep[Int] = column[Int]("first_part_id")
+    /** Database column last_part_content_first SqlType(VARCHAR), Length(28,true) */
+    val lastPartContentFirst: Rep[String] = column[String]("last_part_content_first", O.Length(28,varying=true))
+    /** Database column last_part_content_second SqlType(VARCHAR), Length(28,true) */
+    val lastPartContentSecond: Rep[String] = column[String]("last_part_content_second", O.Length(28,varying=true))
+    /** Database column created_at SqlType(TIMESTAMP) */
+    val createdAt: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created_at")
+    /** Database column updated_at SqlType(TIMESTAMP) */
+    val updatedAt: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("updated_at")
+
+    /** Foreign key referencing FirstPart (database name last_part_ibfk_2) */
+    lazy val firstPartFk = foreignKey("last_part_ibfk_2", firstPartId, FirstPart)(r => r.id, onUpdate=ForeignKeyAction.Cascade, onDelete=ForeignKeyAction.Cascade)
+    /** Foreign key referencing User (database name last_part_ibfk_1) */
+    lazy val userFk = foreignKey("last_part_ibfk_1", userId, User)(r => r.id, onUpdate=ForeignKeyAction.Cascade, onDelete=ForeignKeyAction.Cascade)
+  }
+  /** Collection-like TableQuery object for table LastPart */
+  lazy val LastPart = new TableQuery(tag => new LastPart(tag))
 
   /** Entity class storing rows of table User
    *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
