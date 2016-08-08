@@ -10,6 +10,7 @@ import slick.lifted.TableQuery
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by Shuhei on 2016/08/07.

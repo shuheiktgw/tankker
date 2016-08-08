@@ -73,18 +73,18 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
     }
   }
 
-  def update(preLastPart: Tables.LastPartRow) = AsyncStack { implicit rs =>
+  def update(userId: Long, firstPartId: Long, lastPartId: Long) = AsyncStack { implicit rs =>
 
     // TODO createと処理共通化したい
     lastPartForm.bindFromRequest.fold(
       error => {
-        Future(Redirect(routes.LastPartController.edit(preLastPart.id)).flashing("error" -> "Your Tanka does not match our requirement..."))
+        Future(Redirect(routes.LastPartController.edit(lastPartId)).flashing("error" -> "Your Tanka does not match our requirement..."))
       },
       form => {
         loggedIn match {
-          case Some(user) if user.id == preLastPart.userId => {
-            val lastPart: LastPartRow = LastPartRow(preLastPart.id, preLastPart.userId, preLastPart.firstPartId, form.lastPartContentFirst, form.lastPartContentSecond, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
-            lastPartRepo.reply(lastPart).map {
+          case Some(user) if user.id == userId => {
+            val lastPart: LastPartRow = LastPartRow(lastPartId.toInt, userId.toInt, firstPartId.toInt, form.lastPartContentFirst, form.lastPartContentSecond, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
+            lastPartRepo.change(lastPart).map {
               lastPartOp => Redirect(routes.UserController.show).flashing("success" -> "Your Henka has been successfully updated!")
             }
           }

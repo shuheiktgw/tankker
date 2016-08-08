@@ -38,12 +38,7 @@ class UserController @Inject()(val timelineService: TimelineService, val userRep
         case Some(user) =>
           timelineService.fetchTankaForTL(user.id).map{ tankas =>
             Ok(views.html.user.show(user, firstPartForm, tankas))
-
-
           }
-//          firstPartRepo.findByUserId(user.id).map{ firstPats =>
-//            Ok(views.html.user.show(user, firstPartForm, firstPats))
-//          }
         // TODO エラーページ作って遷移させたい
         case _ => Future(Redirect(routes.LoginController.brandNew))
     }
