@@ -3,8 +3,9 @@ package controllers
 import java.sql.Timestamp
 import javax.inject.Inject
 
+import controllers.FirstPartController.FirstPartForm
 import jp.t2v.lab.play2.auth.OptionalAuthElement
-import models.Tables.{LastPartRow, UserRow}
+import models.Tables.{FirstPartRow, LastPartRow, UserRow}
 import models.{FirstPartRepo, LastPartRepo, Tables, UserRepoLike}
 import play.api.data.Form
 import play.api.data.Forms._
@@ -37,6 +38,7 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
     }
   }
 
+  // TODO FirstPartの方もhiddenじゃなくてcontrollerに直接値を渡すようにする
   def create(userId: Long, firstPartId: Long) = AsyncStack { implicit rs =>
     lastPartForm.bindFromRequest.fold(
       error => {
@@ -46,7 +48,7 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
         loggedIn match {
           case Some(user) if user.id == userId => {
             val lastPart: LastPartRow = LastPartRow(0, userId.toInt, firstPartId.toInt, form.lastPartContentFirst, form.lastPartContentSecond, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
-            lastPartRepo.reply(lastPart).map{
+            lastPartRepo.reply(lastPart).map {
               lastPartOp => Redirect(routes.UserController.show).flashing("success" -> "Your Henka has been successfully posted!")
             }
           }
@@ -56,12 +58,57 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
     )
   }
 
-  def edit(id: Long) = TODO
+  def edit(lastPartId: Long) = AsyncStack { implicit rs =>
+    loggedIn match {
+      case Some(user) => {
+        lastPartRepo.findById(lastPartId) map {
+          case Some(lastPart) if lastPart.userId == user.id => {
+            val form = lastPartForm.fill(LastPartForm(lastPart.lastPartContentFirst, lastPart.lastPartContentSecond))
+            Ok(views.html.lastPart.edit(lastPart, form))
+          }
+          case _ => Redirect(routes.UserController.show)
+        }
+      }
+      case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
+    }
+  }
 
-  def update = TODO
+  def update(preLastPart: Tables.LastPartRow) = AsyncStack { implicit rs =>
 
-  def delete = TODO
+    // TODO createと処理共通化したい
+    lastPartForm.bindFromRequest.fold(
+      error => {
+        Future(Redirect(routes.LastPartController.edit(preLastPart.id)).flashing("error" -> "Your Tanka does not match our requirement..."))
+      },
+      form => {
+        loggedIn match {
+          case Some(user) if user.id == preLastPart.userId => {
+            val lastPart: LastPartRow = LastPartRow(preLastPart.id, preLastPart.userId, preLastPart.firstPartId, form.lastPartContentFirst, form.lastPartContentSecond, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
+            lastPartRepo.reply(lastPart).map {
+              lastPartOp => Redirect(routes.UserController.show).flashing("success" -> "Your Henka has been successfully updated!")
+            }
+          }
+          case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
+        }
+      }
+    )
+  }
 
+  def delete(id: Long) = AsyncStack { implicit rs =>
+    loggedIn match{
+      case Some(user) => {
+        val fetchedLastPart: Future[Option[Tables.LastPartRow]] = lastPartRepo.findById(id)
+        fetchedLastPart map{
+          case f if f.get.userId == user.id => {
+            lastPartRepo.remove(id)
+            Redirect(routes.UserController.show).flashing("success" -> "Your tanka has been successfully updated!")
+          }
+          case _ => Redirect(routes.UserController.show).flashing("error" -> "Goodbye bad boy...")
+        }
+      }
+      case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
+    }
+  }
 }
 
 object LastPartController {
