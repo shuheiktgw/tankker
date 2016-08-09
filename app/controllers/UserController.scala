@@ -7,7 +7,7 @@ import controllers.FirstPartController.firstPartForm
 import play.api.mvc._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.i18n.{I18nSupport, MessagesApi}
-import models.{FirstPartRepo, Tables, UserRepo, UserRepoLike}
+import models.{FirstPartRepo, Tables}
 import javax.inject.Inject
 
 import jp.t2v.lab.play2.auth.{LoginLogout, OptionalAuthElement}
@@ -15,15 +15,18 @@ import models.Tables.UserRow
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import services.TimelineService
+import repositories.{FollowingRepo, UserRepo, UserRepoLike}
+import services.{TimelineService, UserService}
 import slick.driver.JdbcProfile
+import views.models.UserShowCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 /**
   * Created by shuhei.kitagawa on 2016/08/02.
   */
-class UserController @Inject()(val timelineService: TimelineService, val userRepoLike: UserRepoLike, val usersRepo: UserRepo, val firstPartRepo: FirstPartRepo, val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with OptionalAuthElement with AuthConfigImpl{
+class UserController @Inject()(val userService: UserService, val timelineService: TimelineService, val userRepoLike: UserRepoLike, val usersRepo: UserRepo, val firstPartRepo: FirstPartRepo, val followingRepo: FollowingRepo , val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with OptionalAuthElement with AuthConfigImpl{
 
   // TODO Admin権限に設定
   // TODO FLGがtrue のユーザーがログイン出来ないようにしなくてはいけない
@@ -33,12 +36,15 @@ class UserController @Inject()(val timelineService: TimelineService, val userRep
     }
   }
 
-  def show = AsyncStack { implicit rs =>
+  //TODO case classを作ってViewとの値のやり取りをスムーズにする ViewsのModelsの下 userShowMoel的な
+  def show(username: String) = AsyncStack { implicit rs =>
       loggedIn match {
-        case Some(user) =>
-          timelineService.fetchTankaForTL(user.id).map{ tankas =>
-            Ok(views.html.user.show(user, firstPartForm, tankas))
+        case Some(currentUser) => {
+          userService.showUserData(currentUser, username) map{
+            case Some(carrier) => Ok(views.html.user.show(carrier))
+            case _ => Redirect(routes.TimelineController.show).flashing("error" -> "指定されたユーザー名は存在しません")
           }
+        }
         // TODO エラーページ作って遷移させたい
         case _ => Future(Redirect(routes.LoginController.brandNew))
     }
@@ -91,7 +97,7 @@ class UserController @Inject()(val timelineService: TimelineService, val userRep
         val user = UserRow(form.id.get.toInt,form.username,form.email, form.password ,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
         // TODO usernameとemailが被ってた場合の処理を追加
         usersRepo.change(user).map { _ =>
-          Redirect(routes.UserController.show).flashing("success" -> "Your info has been successfully updated")
+          Redirect(routes.UserController.show(user.username)).flashing("success" -> "Your info has been successfully updated")
         }
       }
     )
@@ -108,6 +114,26 @@ class UserController @Inject()(val timelineService: TimelineService, val userRep
       }
     }
   }
+
+  def search = AsyncStack{implicit rs =>
+    searchForm.bindFromRequest.fold(
+      error => {
+        Future(Redirect(routes.TimelineController.show))
+      },
+
+      form =>{
+        loggedIn match{
+          case Some(currentUser) => {
+            usersRepo.findByUsername(form.username) map {
+              case Some(user) => Redirect(routes.UserController.show(form.username)).flashing("success" -> s"${form.username}のページに移動しました")
+              case _ => Redirect(routes.TimelineController.show).flashing("error" -> "入力されたユーザー名は存在しません")
+            }
+          }
+          case _ => Future(Redirect(routes.LoginController.brandNew))
+        }
+      }
+    )
+  }
 }
 
 object UserController {
@@ -123,6 +149,14 @@ object UserController {
       "email" -> email,
       "password" -> nonEmptyText(8, 16)
     )(UserForm.apply)(UserForm.unapply)
+  )
+
+  case class SearchForm(username: String)
+
+  val searchForm = Form(
+    mapping(
+      "username" -> nonEmptyText(1,16)
+    )(SearchForm.apply)(SearchForm.unapply)
   )
 }
 
