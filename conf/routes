@@ -26,8 +26,12 @@ POST        /tanka/update           controllers.FirstPartController.update
 POST        /tanka/delete           controllers.FirstPartController.delete(id:Long)
 
 #LastPart
-GET         /henka/:id           controllers.LastPartController.brandNew(id:Long)
-POST        /henka/create        controllers.LastPartController.create(userId: Long, firstPartId: Long)
+GET         /henka/new/:id          controllers.LastPartController.brandNew(id:Long)
+POST        /henka                  controllers.LastPartController.create(userId: Long, firstPartId: Long)
+GET         /henka/edit/:id         controllers.LastPartController.edit(id: Long)
+POST        /henka/update           controllers.LastPartController.update(preLastPart: Tables.LastPartRow)
+POST        /henka/delete           controllers.FirstPartController.delete(id:Long)
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
