@@ -6,11 +6,12 @@ import javax.inject.Inject
 import controllers.FirstPartController.FirstPartForm
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.Tables.{FirstPartRow, LastPartRow, UserRow}
-import models.{FirstPartRepo, LastPartRepo, Tables, UserRepoLike}
+import models.Tables
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Controller
+import repositories.{FirstPartRepo, LastPartRepo, UserRepoLike}
 import views.html.helper.form
 
 import scala.concurrent.Future
@@ -29,7 +30,7 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
         val firstPart: Future[Option[Tables.FirstPartRow]] = firstPartRepo.findByID(firstPartId)
         firstPart map {
           case Some(firstPart) => Ok(views.html.lastPart.brandNew(user, lastPartForm, firstPart))
-          case _ => Redirect(routes.UserController.show).flashing("error" -> "The Tanka does not exists...")
+          case _ => Redirect(routes.TimelineController.show).flashing("error" -> "The Tanka does not exists...")
         }
 
       }
@@ -49,7 +50,7 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
           case Some(user) if user.id == userId => {
             val lastPart: LastPartRow = LastPartRow(0, userId.toInt, firstPartId.toInt, form.lastPartContentFirst, form.lastPartContentSecond, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
             lastPartRepo.reply(lastPart).map {
-              lastPartOp => Redirect(routes.UserController.show).flashing("success" -> "Your Henka has been successfully posted!")
+              lastPartOp => Redirect(routes.TimelineController.show).flashing("success" -> "Your Henka has been successfully posted!")
             }
           }
           case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
@@ -66,7 +67,7 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
             val form = lastPartForm.fill(LastPartForm(lastPart.lastPartContentFirst, lastPart.lastPartContentSecond))
             Ok(views.html.lastPart.edit(lastPart, form))
           }
-          case _ => Redirect(routes.UserController.show)
+          case _ => Redirect(routes.TimelineController.show)
         }
       }
       case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
@@ -85,7 +86,7 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
           case Some(user) if user.id == userId => {
             val lastPart: LastPartRow = LastPartRow(lastPartId.toInt, userId.toInt, firstPartId.toInt, form.lastPartContentFirst, form.lastPartContentSecond, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
             lastPartRepo.change(lastPart).map {
-              lastPartOp => Redirect(routes.UserController.show).flashing("success" -> "Your Henka has been successfully updated!")
+              lastPartOp => Redirect(routes.TimelineController.show).flashing("success" -> "Your Henka has been successfully updated!")
             }
           }
           case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
@@ -101,9 +102,9 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
         fetchedLastPart map{
           case f if f.get.userId == user.id => {
             lastPartRepo.remove(id)
-            Redirect(routes.UserController.show).flashing("success" -> "Your tanka has been successfully updated!")
+            Redirect(routes.TimelineController.show).flashing("success" -> "Your tanka has been successfully updated!")
           }
-          case _ => Redirect(routes.UserController.show).flashing("error" -> "Goodbye bad boy...")
+          case _ => Redirect(routes.TimelineController.show).flashing("error" -> "Goodbye bad boy...")
         }
       }
       case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))

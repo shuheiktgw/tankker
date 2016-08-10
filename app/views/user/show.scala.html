@@ -1,4 +1,4 @@
-@(user: models.Tables.UserRow, firstPartForm: Form[controllers.FirstPartController.FirstPartForm], tankas: Seq[(Tables.FirstPartRow, Seq[Tables.LastPartRow])])(implicit messages: Messages, flash: Flash)
+@(carrier: views.models.UserShowCarrier)(implicit messages: Messages, flash: Flash)
 @import helper._
 
 @main("ユーザー詳細") {
@@ -14,24 +14,42 @@
         </div>
     }
 
+
+
     <div class="col-xs-6">
-        @form(routes.FirstPartController.create) {
-            <fieldset>
-                <div class="form-group">
-                @inputText(firstPartForm("firstPartContentFirst"), '_label -> "初句")
-                </div>
-                <div class="form-group">
-                @inputText(firstPartForm("firstPartContentSecond"), '_label -> "二句")
-                </div>
-                <div class="form-group">
-                @inputText(firstPartForm("firstPartContentThird"), '_label -> "三句")
-                </div>
-                <input type="hidden" name="userId" value="@user.id" />
-                <div>
-                    <input type="submit" value="保存" class="btn btn-success">
-                </div>
-            </fieldset>
+        @if(carrier.isMyself){
+            @form(routes.FirstPartController.create) {
+                <fieldset>
+                    <div class="form-group">
+                    @inputText(carrier.firstPartForm("firstPartContentFirst"), '_label -> "初句")
+                    </div>
+                    <div class="form-group">
+                    @inputText(carrier.firstPartForm("firstPartContentSecond"), '_label -> "二句")
+                    </div>
+                    <div class="form-group">
+                    @inputText(carrier.firstPartForm("firstPartContentThird"), '_label -> "三句")
+                    </div>
+                    <input type="hidden" name="userId" value="@carrier.requestedUser.id" />
+                    <div>
+                        <input type="submit" value="保存" class="btn btn-success">
+                    </div>
+                </fieldset>
+            }
         }
+
+        @if(!carrier.isMyself && !carrier.isFollowing) {
+            @helper.form(routes.FollowingController.create(carrier.requestedUser.id.toLong)) {
+                <input type="submit" value="フォロー" class="btn btn-danger btn-xs"/>
+            }
+        }
+
+        @if(!carrier.isMyself && carrier.isFollowing){
+            @helper.form(routes.FollowingController.delete(carrier.requestedUser.id.toLong)) {
+                <input type="submit" value="フォローを解除" class="btn btn-danger btn-xs"/>
+            }
+        }
+
+
 
 
         <table class="table table-hover">
@@ -46,7 +64,7 @@
                 </tr>
             </thead>
             <tbody>
-                @tankas.map{ tanka  =>
+                @carrier.tankas.map{ tanka  =>
                     <tr>
                         <td>@tanka._1.firstPartContentFirst</td>
                         <td>@tanka._1.firstPartContentSecond</td>
@@ -54,12 +72,18 @@
                         <td><a href="@routes.LastPartController.brandNew(tanka._1.id.toLong)">
                             <input type="submit" value="返歌" class="btn btn-danger btn-xs"/>
                         </a>
-                        <td><a href="@routes.FirstPartController.edit(tanka._1.id.toLong)">
-                            <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
-                        </a>
+                        <td>
+                        @if(carrier.currentUser.id == tanka._1.userId) {
+                            <a href="@routes.FirstPartController.edit(tanka._1.id.toLong)">
+                                <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
+                            </a>
+                        }
                         </td>
-                        <td>@helper.form(routes.FirstPartController.delete(tanka._1.id)) {
-                            <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
+                        <td>
+                        @if(carrier.currentUser.id == tanka._1.userId) {
+                            @helper.form(routes.FirstPartController.delete(tanka._1.id)) {
+                                <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
+                            }
                         }
                         </td>
                     </tr>
@@ -68,11 +92,18 @@
                           <td>@henka.lastPartContentFirst</td>
                           <td>@henka.lastPartContentSecond</td>
                           <td>"後で直す"</td>
-                          <td><a href="@routes.LastPartController.edit(henka.id.toLong)">
-                              <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
-                          </a>
-                      <td>@helper.form(routes.LastPartController.delete(henka.id.toLong)) {
-                          <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
+                          <td>
+                          @if(carrier.currentUser.id == henka.userId) {
+                              <a href="@routes.LastPartController.edit(henka.id.toLong)">
+                                  <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
+                              </a>
+                          }
+                          </td>
+                      <td>
+                      @if(carrier.currentUser.id == henka.userId) {
+                          @helper.form(routes.LastPartController.delete(henka.id.toLong)) {
+                              <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
+                          }
                       }
                       </td>
                           <td>あとで直す</td>
@@ -85,31 +116,35 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>UserName</th>
-                    <th>Email</th>
-                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>
+                    @if(carrier.isMyself) {
+                        <th>Email</th>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                    }
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>@user.id</td>
-                    <td>@user.username</td>
-                    <td>@user.email</td>
-                    <td>@helper.form(routes.UserController.edit) {
-                        <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
+                    <td>@carrier.requestedUser.username</td>
+                    @if(carrier.isMyself) {
+                        <td>@carrier.requestedUser.email</td>
+                        <td>@helper.form(routes.UserController.edit) {
+                            <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
+                        }
+                        </td>
+                        <td>@helper.form(routes.UserController.delete) {
+                            <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
+                        }
+                        </td>
                     }
-                    </td>
-                    <td>@helper.form(routes.UserController.delete) {
-                        <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
-                    }
-                    </td>
                 </tr>
             </tbody>
         </table>
 
-        <a href="@routes.LoginController.delete">ログアウト</a>
+        @if(carrier.isMyself) {
+            <a href="@routes.LoginController.delete">ログアウト</a>
+        }
     </div>
 }
 

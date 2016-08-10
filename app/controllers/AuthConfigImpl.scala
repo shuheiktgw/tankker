@@ -6,7 +6,8 @@ import play.api.mvc.RequestHeader
 import play.api.mvc.Results._
 
 import scala.concurrent.{ExecutionContext, Future}
-import models.{Tables, UserRepoLike}
+import models.Tables
+import repositories.UserRepoLike
 //import jp.t2v.lab.play2.auth.sample.{Role, Account}
 //import jp.t2v.lab.play2.auth.sample.Role._
 import scala.reflect.{ClassTag, classTag}
@@ -63,7 +64,7 @@ trait AuthConfigImpl extends AuthConfig{
     * ログインが成功した際に遷移する先を指定します。
     */
   def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext) =
-    Future.successful(Redirect(routes.UserController.show))
+    Future.successful(Redirect(routes.TimelineController.show))
 
   /**
     * ログアウトが成功した際に遷移する先を指定します。

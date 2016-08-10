@@ -1,0 +1,38 @@
+@(userId: Long, followings: Seq[Tables.UserRow])(implicit messages: Messages, flash: Flash)
+
+@main("フォロー一覧") {
+    @flash.get("success").map { message =>
+        <div class="alert alert-success" role="alert">
+            @message
+        </div>
+    }
+
+    @flash.get("error").map { message =>
+        <div class="alert alert-danger" role="alert">
+            @message
+        </div>
+    }
+
+    <div class="col-xs-6">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>User Name</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+            @followings.map { following =>
+                <tr>
+                    <td>@following.username</td>
+                    <td>@helper.form(routes.FollowingController.delete(following.id)){
+                        <input type="submit" value="フォローを解除" class="btn btn-danger btn-xs"/>
+                    }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+}

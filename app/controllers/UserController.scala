@@ -7,7 +7,7 @@ import controllers.FirstPartController.firstPartForm
 import play.api.mvc._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.i18n.{I18nSupport, MessagesApi}
-import models.{FirstPartRepo, Tables}
+import models.Tables
 import javax.inject.Inject
 
 import jp.t2v.lab.play2.auth.{LoginLogout, OptionalAuthElement}
@@ -15,7 +15,7 @@ import models.Tables.UserRow
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import repositories.{FollowingRepo, UserRepo, UserRepoLike}
+import repositories.{FirstPartRepo, FollowingRepo, UserRepo, UserRepoLike}
 import services.{TimelineService, UserService}
 import slick.driver.JdbcProfile
 import views.models.UserShowCarrier
@@ -26,7 +26,7 @@ import scala.concurrent.{Await, Future}
 /**
   * Created by shuhei.kitagawa on 2016/08/02.
   */
-class UserController @Inject()(val userService: UserService, val timelineService: TimelineService, val userRepoLike: UserRepoLike, val usersRepo: UserRepo, val firstPartRepo: FirstPartRepo, val followingRepo: FollowingRepo , val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with OptionalAuthElement with AuthConfigImpl{
+class UserController @Inject()(val userService: UserService, val userRepoLike: UserRepoLike, val usersRepo: UserRepo, val firstPartRepo: FirstPartRepo, val followingRepo: FollowingRepo , val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with OptionalAuthElement with AuthConfigImpl{
 
   // TODO Admin権限に設定
   // TODO FLGがtrue のユーザーがログイン出来ないようにしなくてはいけない
@@ -36,7 +36,6 @@ class UserController @Inject()(val userService: UserService, val timelineService
     }
   }
 
-  //TODO case classを作ってViewとの値のやり取りをスムーズにする ViewsのModelsの下 userShowMoel的な
   def show(username: String) = AsyncStack { implicit rs =>
       loggedIn match {
         case Some(currentUser) => {
@@ -45,7 +44,6 @@ class UserController @Inject()(val userService: UserService, val timelineService
             case _ => Redirect(routes.TimelineController.show).flashing("error" -> "指定されたユーザー名は存在しません")
           }
         }
-        // TODO エラーページ作って遷移させたい
         case _ => Future(Redirect(routes.LoginController.brandNew))
     }
   }
@@ -60,18 +58,17 @@ class UserController @Inject()(val userService: UserService, val timelineService
   def create = AsyncStack{ implicit rs =>
     userForm.bindFromRequest.fold(
       error => {
-        Future(BadRequest(views.html.user.brandNew(userForm)).flashing("error" -> "Goodbye bad boy..."))
+        Future(Redirect(routes.UserController.brandNew).flashing("error" -> "新規作成フォームに入力された値が正しくありません"))
       },
       form =>{
         val user = UserRow(0,form.username,form.email,form.password,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
         usersRepo.add(user).flatMap { userOp =>
-          gotoLoginSucceeded(user.username).map(_.flashing("success" -> "Welcome to Tankker!"))
+          gotoLoginSucceeded(user.username).map(_.flashing("success" -> "Tankkerへようこそ!"))
         }
       }
     )
   }
 
-  // TODO ViewのほうがPOSTになってるので,Getに帰る
   def edit = AsyncStack { implicit rs =>
     Future{
       loggedIn match {
@@ -85,8 +82,6 @@ class UserController @Inject()(val userService: UserService, val timelineService
     }
   }
 
-
-  // TODO HTTPリクエストのメソッドをPatchでRootを/userに変更
   def update = AsyncStack{ implicit rs =>
     userForm.bindFromRequest.fold(
       error => {
