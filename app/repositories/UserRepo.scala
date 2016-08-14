@@ -1,23 +1,17 @@
-package models
+package repositories
 
-import play.api.Play
-import play.api.data.Form
-import play.api.data.Forms._
-import java.sql.Timestamp
-
+import com.github.t3hnar.bcrypt._
 import com.google.inject.{ImplementedBy, Inject}
-import slick.profile.SqlProfile.ColumnOption.SqlType
+import controllers.LoginController.LoginForm
+import models.Tables
+import models.Tables.{User, UserRow}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-
-import scala.concurrent.{Await, Future}
 import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
-import models.Tables.{User, UserRow}
-import com.github.t3hnar.bcrypt._
-import controllers.LoginController.LoginForm
+import scala.concurrent.{Await, Future}
 
 /**
   * Created by shuhei.kitagawa on 2016/08/02.

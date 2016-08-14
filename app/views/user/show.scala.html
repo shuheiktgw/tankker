@@ -1,122 +1,190 @@
-@(user: models.Tables.UserRow, firstPartForm: Form[controllers.FirstPartController.FirstPartForm], firstParts: Seq[Tables.FirstPartRow])(implicit messages: Messages, flash: Flash)
-    @import helper._
+@(carrier: views.models.UserShowCarrier)(implicit messages: Messages, flash: Flash)
+@import helper._
 
-    @main("ユーザー詳細") {
-        @flash.get("success").map { message =>
-            <div class="alert alert-success" role="alert">
-                @message
-            </div>
-        }
-
-        @flash.get("error").map { message =>
-            <div class="alert alert-danger" role="alert">
-                @message
-            </div>
-        }
-
-        <div class="col-xs-6">
-            @form(routes.FirstPartController.create) {
-                <fieldset>
-                    <div class="form-group">
-                    @inputText(firstPartForm("firstPartContentFirst"), '_label -> "初句")
-                    </div>
-                    <div class="form-group">
-                    @inputText(firstPartForm("firstPartContentSecond"), '_label -> "二句")
-                    </div>
-                    <div class="form-group">
-                    @inputText(firstPartForm("firstPartContentThird"), '_label -> "三句")
-                    </div>
-                    <input type="hidden" name="userId" value="@user.id" />
-                    <div>
-                        <input type="submit" value="保存" class="btn btn-success">
-                    </div>
-                </fieldset>
-            }
-
-
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>初句</th>
-                        <th>二句</th>
-                        <th>三句</th>
-                        <th>&nbsp;</th>
-                        <th>&nbsp;</th>
-                        <th>&nbsp;</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @firstParts.map { firstPart =>
-                    <tr>
-                        <td>@firstPart.firstPartContentFirst</td>
-                        <td>@firstPart.firstPartContentSecond</td>
-                        <td>@firstPart.firstPartContentThird</td>
-                        <td>
-                            <a href="@routes.LastPartController.brandNew(firstPart.id.toLong)">
-                            <input type="submit" value="返歌" class="btn btn-danger btn-xs"/>
-                        </a>
-                        </td>
-                        <td>
-                            <a href="@routes.FirstPartController.edit(firstPart.id.toLong)">
-                            <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
-                        </a>
-                        </td>
-                        <td>@helper.form(routes.FirstPartController.delete(firstPart.id)) {
-                            <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
-                        }
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>@firstPart.firstPartContentFirst</td>
-                        <td>@firstPart.firstPartContentSecond</td>
-                        <td>@firstPart.firstPartContentThird</td>
-                        <td>
-                            <a href="@routes.LastPartController.brandNew(firstPart.id.toLong)">
-                                <input type="submit" value="返歌" class="btn btn-danger btn-xs"/>
-                            </a>
-                        </td>
-                        <td>
-                            <a href="@routes.FirstPartController.edit(firstPart.id.toLong)">
-                                <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
-                            </a>
-                        </td>
-                        <td>@helper.form(routes.FirstPartController.delete(firstPart.id)) {
-                            <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
-                        }
-                        </td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>UserName</th>
-                        <th>Email</th>
-                        <th>&nbsp;</th>
-                        <th>&nbsp;</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>@user.id</td>
-                        <td>@user.username</td>
-                        <td>@user.email</td>
-                        <td>@helper.form(routes.UserController.edit) {
-                            <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
-                        }
-                        </td>
-                        <td>@helper.form(routes.UserController.delete) {
-                            <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
-                        }
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <a href="@routes.LoginController.delete">ログアウト</a>
+@main("ユーザー詳細") {
+    @flash.get("success").map { message =>
+        <div class="alert alert-success" role="alert">
+            @message
         </div>
     }
+
+    @flash.get("error").map { message =>
+        <div class="alert alert-danger" role="alert">
+            @message
+        </div>
+    }
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="row profile-container">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <img class="profile-image" src="https://pbs.twimg.com/profile_images/442670117285933056/rA0-lbNb.jpeg" alt="basho">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 profile-name">
+                                <p>@@@carrier.requestedUser.username</p>
+                            </div>
+                        </div>
+                        <div class="row number-row">
+                            <div class="col-md-4 profile-number">
+                                <h3>ツイート</h3>
+                                <a href="@routes.UserController.show(carrier.requestedUser.username)">@carrier.userNumbers._1</a>
+                            </div>
+                            <div class="col-md-4 profile-number">
+                                <h3>フォロー</h3>
+                                <a href="@routes.FollowingController.followingIndex(carrier.requestedUser.id)">@carrier.userNumbers._2</a>
+                            </div>
+                            <div class="col-md-4 profile-number">
+                                <h3>フォロワー</h3>
+                                <a href="@routes.FollowingController.followerIndex(carrier.requestedUser.id)">@carrier.userNumbers._3</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        @if(!carrier.isMyself && !carrier.isFollowing) {
+                            @helper.form(routes.FollowingController.create(carrier.requestedUser.id.toLong)) {
+                                <input type="submit" value="フォロー" class="btn btn-blue900_rsd btn-block">
+                            }
+                        }
+
+                        @if(!carrier.isMyself && carrier.isFollowing) {
+                            @helper.form(routes.FollowingController.delete(carrier.requestedUser.id.toLong)) {
+                                <input type="submit" value="フォローを解除" class="btn btn-blue900_rsd btn-block">
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1">
+                        <div class="row">
+                            <div class="col-md-6 timeline-container">
+                                <a href="@routes.UserController.show(carrier.requestedUser.username)">Tankas</a>
+                            </div>
+                            <div class="col-md-6 timeline-container">
+                                <a href=#>Henkas</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @carrier.tankas.map { tanka =>
+                    <div class="row tweet-top">
+                        <div class="col-md-10 col-md-offset-1 timeline-container">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <img class="tweet-image" src="https://pbs.twimg.com/profile_images/442670117285933056/rA0-lbNb.jpeg" alt="basho">
+                                        </div>
+                                        <div class="col-md-12 tweet-profile-top">
+                                            <p>@@ @tanka._1.userId</p>
+                                        </div>
+                                        <div class="col-md-12 tweet-profile-bottom">
+                                            <p>@tanka._1.createdAt.toLocalDateTime.toLocalDate</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="row tweet-content">
+                                        <div class="col-md-12">
+                                            <p>@tanka._1.firstPartContentFirst</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p>@tanka._1.firstPartContentSecond</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p>@tanka._1.firstPartContentThird</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-10 col-md-offset-1">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <a href="@routes.LastPartController.brandNew(tanka._1.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/henka.png")"></a>
+                                        </div>
+                                        <div class="col-md-4">
+                                        @if(carrier.currentUser.id == tanka._1.userId) {
+                                            <a href="@routes.FirstPartController.edit(tanka._1.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/edit.png")"></a>
+                                        }
+                                        </div>
+                                        <div class="col-md-4">
+                                        @if(carrier.currentUser.id == tanka._1.userId) {
+                                            <a href="#"><img class="tweet-icon" src="@routes.Assets.at("images/delete.png")"></a>
+                                        }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @tanka._2.map { henka =>
+                    <div class="row henka-top">
+                        <div class="col-md-10 col-md-offset-1 timeline-container">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <img class="tweet-image" src="https://pbs.twimg.com/profile_images/442670117285933056/rA0-lbNb.jpeg" alt="basho">
+                                        </div>
+                                        <div class="col-md-12 tweet-profile-top">
+                                            <p>@@ @henka.userId</p>
+                                        </div>
+                                        <div class="col-md-12 tweet-profile-bottom">
+                                            <p>@henka.createdAt.toLocalDateTime.toLocalDate</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="row tweet-content">
+                                        <div class="col-md-12">
+                                            <p>@henka.lastPartContentFirst</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p>@henka.lastPartContentSecond</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-10 col-md-offset-1">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                        </div>
+                                        <div class="col-md-4">
+                                        @if(carrier.currentUser.id == henka.userId) {
+                                            <a href="@routes.LastPartController.edit(henka.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/edit.png")"></a>
+                                        }
+                                        </div>
+                                        <div class="col-md-4">
+                                        @if(carrier.currentUser.id == henka.userId) {
+                                            <a href="#"><img class="tweet-icon" src="@routes.Assets.at("images/delete.png")"></a>
+                                        }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                }
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-12 timeline-container">
+                        フォーム
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 

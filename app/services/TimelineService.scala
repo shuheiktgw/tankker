@@ -1,52 +1,42 @@
 package services
 
 import com.google.inject.Inject
+import models.Tables
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 import models.Tables.{FirstPart, LastPart, User}
+import repositories.{FirstPartRepo, FollowingRepo, LastPartRepo}
 import slick.driver.MySQLDriver.api._
 import slick.lifted.TableQuery
+
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by Shuhei on 2016/08/07.
   */
-class TimelineService@Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
+class TimelineService @Inject()(val followingRepo: FollowingRepo, val firstPartRepo: FirstPartRepo, val lastPartRepo: LastPartRepo) {
 
-  val User = TableQuery[User]
-  val FirstPart = TableQuery[FirstPart]
-  val LastPart = TableQuery[LastPart]
-
-  val findTankaQueryForTL = User
-    .join(FirstPart).on(_.id === _.userId)
-    .join(LastPart).on(_._2.id === _.firstPartId)
-    .result
-
-  val action = (for{
-    tankaResultForTL <- findTankaQueryForTL
-  }yield{
-    tankaResultForTL.map{ row =>
-      val (userTableRow,firstPartTableRow) = row._1
-      val lastPartTableRow = row._2
+  //TODO 動作確認したら消してOK 既にUserServiceに移動済み
+  def fetchTankaForTL(userId: Long): Future[Seq[(Tables.FirstPartRow, Seq[Tables.LastPartRow])]] = {
+    firstPartRepo.findByUserId(userId).map{ firstParts =>
+      firstParts map{ firstPart =>
+        (firstPart, Await.result(lastPartRepo.findByFirstPartId(firstPart.id), Duration.Inf))
+      }
     }
   }
 
-    )
-
-//  val findBooksQuery = libraries
-//    .join(libraryToBooks).on(_.id === _.libraryId)
-//    .join(books).on(_.id === _._2.bookId)
-//    .result
-//
-//  val action = (for {
-//    booksResult <- findBooksQuery
-//  } yield {
-//    booksResult.map { row =>
-//      val (libraryTableRow, libraryToBooksTableRow) = row._1
-//      val booksTableRow = row._2
-//      // TODO: Access all data from the rows and construct desired DS
-//    }
-//  }
-
-
-
+  // TODO ここは後で直す
+  def fetchTankasForTimeline(userId: Long): Future[Seq[(Tables.FirstPartRow, Seq[Tables.LastPartRow])]] = {
+    val userIds: Future[Seq[Int]] = followingRepo.fetchFollowingUserIds(userId)
+    userIds flatMap {ids =>
+      val userIdsForTl: Seq[Int] = userId.toInt +: ids
+      firstPartRepo.findByUserIds(userIdsForTl).map { firstParts =>
+        firstParts map { firstPart =>
+          (firstPart, Await.result(lastPartRepo.findByFirstPartId(firstPart.id), Duration.Inf))
+        }
+      }
+    }
+  }
 }

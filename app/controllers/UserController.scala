@@ -7,7 +7,7 @@ import controllers.FirstPartController.firstPartForm
 import play.api.mvc._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.i18n.{I18nSupport, MessagesApi}
-import models.{FirstPartRepo, Tables, UserRepo, UserRepoLike}
+import models.Tables
 import javax.inject.Inject
 
 import jp.t2v.lab.play2.auth.{LoginLogout, OptionalAuthElement}
@@ -15,14 +15,18 @@ import models.Tables.UserRow
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import repositories.{FirstPartRepo, FollowingRepo, UserRepo, UserRepoLike}
+import services.{TimelineService, UserService}
 import slick.driver.JdbcProfile
+import views.models.UserShowCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 /**
   * Created by shuhei.kitagawa on 2016/08/02.
   */
-class UserController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: UserRepo, val firstPartRepo: FirstPartRepo, val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with OptionalAuthElement with AuthConfigImpl{
+class UserController @Inject()(val userService: UserService, val userRepoLike: UserRepoLike, val usersRepo: UserRepo, val firstPartRepo: FirstPartRepo, val followingRepo: FollowingRepo , val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with OptionalAuthElement with AuthConfigImpl{
 
   // TODO Admin権限に設定
   // TODO FLGがtrue のユーザーがログイン出来ないようにしなくてはいけない
@@ -32,13 +36,14 @@ class UserController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: Us
     }
   }
 
-  def show = AsyncStack { implicit rs =>
+  def show(username: String) = AsyncStack { implicit rs =>
       loggedIn match {
-        case Some(user) =>
-          firstPartRepo.all(user.id).map{ firstPats =>
-            Ok(views.html.user.show(user, firstPartForm, firstPats))
+        case Some(currentUser) => {
+          userService.showUserData(currentUser, username) map{
+            case Some(carrier) => Ok(views.html.user.show(carrier))
+            case _ => Redirect(routes.TimelineController.show).flashing("error" -> "指定されたユーザー名は存在しません")
           }
-        // TODO エラーページ作って遷移させたい
+        }
         case _ => Future(Redirect(routes.LoginController.brandNew))
     }
   }
@@ -53,18 +58,17 @@ class UserController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: Us
   def create = AsyncStack{ implicit rs =>
     userForm.bindFromRequest.fold(
       error => {
-        Future(BadRequest(views.html.user.brandNew(userForm)).flashing("error" -> "Goodbye bad boy..."))
+        Future(Redirect(routes.UserController.brandNew).flashing("error" -> "新規作成フォームに入力された値が正しくありません"))
       },
       form =>{
         val user = UserRow(0,form.username,form.email,form.password,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
         usersRepo.add(user).flatMap { userOp =>
-          gotoLoginSucceeded(user.username).map(_.flashing("success" -> "Welcome to Tankker!"))
+          gotoLoginSucceeded(user.username).map(_.flashing("success" -> "Tankkerへようこそ!"))
         }
       }
     )
   }
 
-  // TODO ViewのほうがPOSTになってるので,Getに帰る
   def edit = AsyncStack { implicit rs =>
     Future{
       loggedIn match {
@@ -78,8 +82,6 @@ class UserController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: Us
     }
   }
 
-
-  // TODO HTTPリクエストのメソッドをPatchでRootを/userに変更
   def update = AsyncStack{ implicit rs =>
     userForm.bindFromRequest.fold(
       error => {
@@ -90,7 +92,7 @@ class UserController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: Us
         val user = UserRow(form.id.get.toInt,form.username,form.email, form.password ,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
         // TODO usernameとemailが被ってた場合の処理を追加
         usersRepo.change(user).map { _ =>
-          Redirect(routes.UserController.show).flashing("success" -> "Your info has been successfully updated")
+          Redirect(routes.UserController.show(user.username)).flashing("success" -> "Your info has been successfully updated")
         }
       }
     )
@@ -107,6 +109,26 @@ class UserController @Inject()(val userRepoLike: UserRepoLike, val usersRepo: Us
       }
     }
   }
+
+  def search = AsyncStack{implicit rs =>
+    searchForm.bindFromRequest.fold(
+      error => {
+        Future(Redirect(routes.TimelineController.show))
+      },
+
+      form =>{
+        loggedIn match{
+          case Some(currentUser) => {
+            usersRepo.findByUsername(form.username) map {
+              case Some(user) => Redirect(routes.UserController.show(form.username)).flashing("success" -> s"${form.username}のページに移動しました")
+              case _ => Redirect(routes.TimelineController.show).flashing("error" -> "入力されたユーザー名は存在しません")
+            }
+          }
+          case _ => Future(Redirect(routes.LoginController.brandNew))
+        }
+      }
+    )
+  }
 }
 
 object UserController {
@@ -122,6 +144,14 @@ object UserController {
       "email" -> email,
       "password" -> nonEmptyText(8, 16)
     )(UserForm.apply)(UserForm.unapply)
+  )
+
+  case class SearchForm(username: String)
+
+  val searchForm = Form(
+    mapping(
+      "username" -> nonEmptyText(1,16)
+    )(SearchForm.apply)(SearchForm.unapply)
   )
 }
 

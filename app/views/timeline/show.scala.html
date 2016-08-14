@@ -1,0 +1,257 @@
+@(user: models.Tables.UserRow, firstPartForm: Form[controllers.FirstPartController.FirstPartForm], tankas: Seq[(Tables.FirstPartRow, Seq[Tables.LastPartRow])], searchForm: Form[controllers.UserController.SearchForm])(implicit messages: Messages, flash: Flash)
+@import helper._
+
+@main("ユーザー詳細") {
+    @flash.get("success").map { message =>
+        <div class="alert alert-success" role="alert">
+            @message
+        </div>
+    }
+
+    @flash.get("error").map { message =>
+        <div class="alert alert-danger" role="alert">
+            @message
+        </div>
+    }
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 profile-container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <img class="profile-image" src="https://pbs.twimg.com/profile_images/442670117285933056/rA0-lbNb.jpeg" alt="basho">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 profile-name">
+                        <p>@@ @user.username</p>
+                    </div>
+                </div>
+                <div class="row number-row">
+                    <div class="col-md-4 profile-number">
+                        <h3>ツイート</h3>
+                        <p>300</p>
+                    </div>
+                    <div class="col-md-4 profile-number">
+                        <h3>フォロー</h3>
+                        <p>300</p>
+                    </div>
+                    <div class="col-md-4 profile-number">
+                        <h3>フォロワー</h3>
+                        <p>300</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 timeline-container">
+                        @form(routes.FirstPartController.create, 'role -> "form") {
+                            <fieldset>
+                                <div class="form-group tweet-form-top">
+                                @inputText(firstPartForm("firstPartContentFirst"), 'class -> "form-control", '_label -> null, 'placeholder -> "ガラス戸の", '_showConstraints -> false)
+                                </div>
+                                <div class="form-group tweet-form">
+                                @inputPassword(firstPartForm("firstPartContentSecond"),'class -> "form-control", '_label -> null, 'placeholder -> "外のつきよを", '_showConstraints -> false)
+                                </div>
+                                <div class="form-group tweet-form">
+                                @inputPassword(firstPartForm("firstPartContentThird"),'class -> "form-control", '_label -> null, 'placeholder -> "ながむれど", '_showConstraints -> false)
+                                </div>
+                                <input type="hidden" name="userId" value="@user.id" />
+                                <input type="submit" value="詠む" class="btn btn-blue900_rsd btn-block">
+                            </fieldset>
+                        }
+                    </div>
+                </div>
+                @tankas.map { tanka =>
+                <div class="row tweet-top">
+                    <div class="col-md-10 col-md-offset-1 timeline-container">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <img class="tweet-image" src="https://pbs.twimg.com/profile_images/442670117285933056/rA0-lbNb.jpeg" alt="basho">
+                                    </div>
+                                    <div class="col-md-12 tweet-profile-top">
+                                        <p>@@@tanka._1.userId</p>
+                                    </div>
+                                    <div class="col-md-12 tweet-profile-bottom">
+                                        <p>@tanka._1.createdAt.toLocalDateTime.toLocalDate</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row tweet-content">
+                                    <div class="col-md-12">
+                                        <p>@tanka._1.firstPartContentFirst</p>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <p>@tanka._1.firstPartContentSecond</p>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <p>@tanka._1.firstPartContentThird</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-10 col-md-offset-1">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <a href="@routes.LastPartController.brandNew(tanka._1.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/henka.png")"></a>
+                                    </div>
+                                    <div class="col-md-4">
+                                    @if(user.id == tanka._1.userId) {
+                                        <a href="@routes.FirstPartController.edit(tanka._1.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/edit.png")"></a>
+                                    }
+                                    </div>
+                                    <div class="col-md-4">
+                                    @if(user.id == tanka._1.userId) {
+                                        <a href="#"><img class="tweet-icon" src="@routes.Assets.at("images/delete.png")"></a>
+                                    }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @tanka._2.map { henka =>
+                    <div class="row henka-top">
+                        <div class="col-md-10 col-md-offset-1 timeline-container">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <img class="tweet-image" src="https://pbs.twimg.com/profile_images/442670117285933056/rA0-lbNb.jpeg" alt="basho">
+                                        </div>
+                                        <div class="col-md-12 tweet-profile-top">
+                                            <p>@@@henka.userId</p>
+                                        </div>
+                                        <div class="col-md-12 tweet-profile-bottom">
+                                            <p>@henka.createdAt.toLocalDateTime.toLocalDate</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="row tweet-content">
+                                        <div class="col-md-12">
+                                            <p>@henka.lastPartContentFirst</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p>@henka.lastPartContentSecond</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-10 col-md-offset-1">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                        </div>
+                                        <div class="col-md-4">
+                                        @if(user.id == henka.userId) {
+                                            <a href="@routes.LastPartController.edit(henka.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/edit.png")"></a>
+                                        }
+                                        </div>
+                                        <div class="col-md-4">
+                                        @if(user.id == henka.userId) {
+                                            <a href="#"><img class="tweet-icon" src="@routes.Assets.at("images/delete.png")"></a>
+                                        }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                }
+            </div>
+            <div class="col-md-3" style="background-color : #1b0733">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2" style="background-color : #000">
+                            tttttttttttttttt
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="col-xs-6">
+
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>初句</th>
+                    <th>二句</th>
+                    <th>三句</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                @tankas.map { tanka =>
+                    <tr>
+                        <td>@tanka._1.firstPartContentFirst</td>
+                        <td>@tanka._1.firstPartContentSecond</td>
+                        <td>@tanka._1.firstPartContentThird</td>
+                        <td>
+                            <a href="@routes.LastPartController.brandNew(tanka._1.id.toLong)">
+                                <input type="submit" value="返歌" class="btn btn-danger btn-xs"/>
+                            </a>
+                        </td>
+                        <td>
+                        @if(user.id == tanka._1.userId) {
+                            <a href="@routes.FirstPartController.edit(tanka._1.id.toLong)">
+                                <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
+                            </a>
+                        }
+                        </td>
+                        <td>
+                        @if(user.id == tanka._1.userId) {
+                            @helper.form(routes.FirstPartController.delete(tanka._1.id)) {
+                                <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
+                            }
+                        }
+                        </td>
+                    </tr>
+                @tanka._2.map { henka =>
+                    <tr>
+                        <td>@henka.lastPartContentFirst</td>
+                        <td>@henka.lastPartContentSecond</td>
+                        <td>"後で直す"</td>
+                        <td>
+                        @if(user.id == henka.userId) {
+                            <a href="@routes.LastPartController.edit(henka.id.toLong)">
+                                <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
+                            </a>
+                        }
+                        </td>
+                        <td>
+                        @if(user.id == henka.userId) {
+                            @helper.form(routes.LastPartController.delete(henka.id.toLong)) {
+                                <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
+                            }
+                        }
+                        </td>
+                        <td>あとで直す</td>
+                    </tr>
+                }
+                }
+
+                @form(routes.UserController.search) {
+                    <fieldset>
+                        <div class="form-group">
+                        @inputText(searchForm("username"), '_label -> "User Name")
+                        </div>
+                        <div>
+                            <input type="submit" value="検索" class="btn btn-success">
+                        </div>
+                    </fieldset>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+

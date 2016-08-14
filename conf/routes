@@ -7,17 +7,21 @@ GET     /                           controllers.Application.index
 
 # User
 GET         /users                  controllers.UserController.index
-GET         /user                   controllers.UserController.show
+GET         /users/:username         controllers.UserController.show(username: String)
 GET         /user/new               controllers.UserController.brandNew
 POST        /user                   controllers.UserController.create
 GET         /user/edit              controllers.UserController.edit
 POST        /user/update            controllers.UserController.update
 POST        /user/delete            controllers.UserController.delete
+POST        /user/search            controllers.UserController.search
 
 #Login
 GET         /login                  controllers.LoginController.brandNew
 POST        /login                  controllers.LoginController.create
 GET         /logout                 controllers.LoginController.delete
+
+#Timeline
+GET         /timeline               controllers.TimelineController.show
 
 #FirstPart
 POST        /tanka                  controllers.FirstPartController.create
@@ -26,12 +30,18 @@ POST        /tanka/update           controllers.FirstPartController.update
 POST        /tanka/delete           controllers.FirstPartController.delete(id:Long)
 
 #LastPart
-GET         /henka/new/:id          controllers.LastPartController.brandNew(id:Long)
-POST        /henka                  controllers.LastPartController.create(userId: Long, firstPartId: Long)
-GET         /henka/edit/:id         controllers.LastPartController.edit(id: Long)
-POST        /henka/update           controllers.LastPartController.update(preLastPart: Tables.LastPartRow)
-POST        /henka/delete           controllers.FirstPartController.delete(id:Long)
+GET         /henka/:id              controllers.LastPartController.brandNew(id:Long)
+POST        /henka/create           controllers.LastPartController.create(userId: Long, firstPartId: Long)
+GET         /henka/edit/:lastPartId controllers.LastPartController.edit(lastPartId: Long)
+POST        /henka/update           controllers.LastPartController.update(userId: Long, firstPartId: Long, lastPartId: Long)
+POST        /henka/delete           controllers.LastPartController.delete(id: Long)
 
+#Following
+GET         /followings             controllers.FollowingController.followingIndex
+GET         /followers              controllers.FollowingController.followerIndex
+POST        /following/create        controllers.FollowingController.create(id: Long)
+POST        /following/delete       controllers.FollowingController.delete(followingUserId: Long)
+POST        /follower/block         controllers.FollowingController.block(follower: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

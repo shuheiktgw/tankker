@@ -1,0 +1,121 @@
+
+/*ロゴ*/
+span#logo { font-family: 'Abel', sans-serif;}
+
+/*profile*/
+.profile-container{
+    border-radius: 2%;
+    border: solid  #E1E8ED 1.5px;
+    background-color: #ffffff;
+    padding: 10px;
+}
+
+.profile-image {
+    border-radius: 50%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 15px;
+    width: 140px;
+    height: 140px;
+}
+
+.profile-name  p{
+    text-align: center;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.number-row{
+    border-top: solid  #E1E8ED 1.5px;
+}
+
+.profile-number h3{
+    text-align: center;
+    font-weight: 100;
+    font-size: 10px;
+}
+
+.profile-number p{
+    text-align: center;
+    font-weight: 900;
+    font-size: 25px;
+}
+
+/*timeline*/
+.timeline-container{
+    border-radius: 2%;
+    border: solid  #E1E8ED 1.5px;
+    background-color: #ffffff;
+    padding: 10px;
+}
+
+.tweet-form-top{
+    margin-top: -10px;
+}
+
+.tweet-form{
+    margin-top: -20px;
+}
+
+.tweet-top{
+    margin-top: 20px;
+}
+
+.tweet-content{
+    font-size: 20px;
+    font-weight: bold;
+    font-family: Quicksand, 游ゴシック体, 'Yu Gothic', YuGothic, 'ヒラギノ角ゴシック Pro', 'Hiragino Kaku Gothic Pro';
+}
+
+.tweet-image{
+    border-radius: 50%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50px;
+    height: 50px;
+}
+
+.tweet-profile-top{
+    margin-top: 10px;
+}
+
+.tweet-profile-bottom{
+    margin-top: -8px;
+}
+
+.tweet-profile-top p{
+    text-align: center;
+    vertical-align: middle;
+    font-weight: 400;
+    font-size: 15px;
+}
+
+.tweet-profile-bottom p{
+    text-align: center;
+    vertical-align: middle;
+    font-weight: 400;
+    font-size: 15px;
+}
+
+.tweet-icon{
+    display: block;
+    margin: auto;
+    width: 15px;
+}
+
+a:hover img.tweet-icon{
+    cursor:pointer;
+    filter: alpha(opacity=60);        /* ie lt 8 */
+    -ms-filter: "alpha(opacity=60)";  /* ie 8 */
+    -moz-opacity:0.6;                 /* FF lt 1.5, Netscape */
+    -khtml-opacity: 0.6;              /* Safari 1.x */
+    opacity:0.6;
+    zoom:1;
+}
+
+.henka-top{
+    margin-top: 3px;
+}
+

@@ -14,7 +14,7 @@ trait Tables {
   import slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = FirstPart.schema ++ LastPart.schema ++ User.schema
+  lazy val schema: profile.SchemaDescription = FirstPart.schema ++ Following.schema ++ LastPart.schema ++ User.schema
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -58,6 +58,43 @@ trait Tables {
   }
   /** Collection-like TableQuery object for table FirstPart */
   lazy val FirstPart = new TableQuery(tag => new FirstPart(tag))
+
+  /** Entity class storing rows of table Following
+   *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
+   *  @param userId Database column user_id SqlType(INT)
+   *  @param followingUserId Database column following_user_id SqlType(INT)
+   *  @param createdAt Database column created_at SqlType(TIMESTAMP) */
+  case class FollowingRow(id: Int, userId: Int, followingUserId: Int, createdAt: java.sql.Timestamp)
+  /** GetResult implicit for fetching FollowingRow objects using plain SQL queries */
+  implicit def GetResultFollowingRow(implicit e0: GR[Int], e1: GR[java.sql.Timestamp]): GR[FollowingRow] = GR{
+    prs => import prs._
+    FollowingRow.tupled((<<[Int], <<[Int], <<[Int], <<[java.sql.Timestamp]))
+  }
+  /** Table description of table FOLLOWING. Objects of this class serve as prototypes for rows in queries. */
+  class Following(_tableTag: Tag) extends Table[FollowingRow](_tableTag, "FOLLOWING") {
+    def * = (id, userId, followingUserId, createdAt) <> (FollowingRow.tupled, FollowingRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(id), Rep.Some(userId), Rep.Some(followingUserId), Rep.Some(createdAt)).shaped.<>({r=>import r._; _1.map(_=> FollowingRow.tupled((_1.get, _2.get, _3.get, _4.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column id SqlType(INT), AutoInc, PrimaryKey */
+    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column user_id SqlType(INT) */
+    val userId: Rep[Int] = column[Int]("user_id")
+    /** Database column following_user_id SqlType(INT) */
+    val followingUserId: Rep[Int] = column[Int]("following_user_id")
+    /** Database column created_at SqlType(TIMESTAMP) */
+    val createdAt: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created_at")
+
+    /** Foreign key referencing User (database name following_ibfk_1) */
+    lazy val userFk1 = foreignKey("following_ibfk_1", userId, User)(r => r.id, onUpdate=ForeignKeyAction.Cascade, onDelete=ForeignKeyAction.Cascade)
+    /** Foreign key referencing User (database name following_ibfk_2) */
+    lazy val userFk2 = foreignKey("following_ibfk_2", followingUserId, User)(r => r.id, onUpdate=ForeignKeyAction.Cascade, onDelete=ForeignKeyAction.Cascade)
+
+    /** Uniqueness Index over (userId,followingUserId) (database name user_id) */
+    val index1 = index("user_id", (userId, followingUserId), unique=true)
+  }
+  /** Collection-like TableQuery object for table Following */
+  lazy val Following = new TableQuery(tag => new Following(tag))
 
   /** Entity class storing rows of table LastPart
    *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey

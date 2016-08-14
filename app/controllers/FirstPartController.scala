@@ -5,7 +5,7 @@ import javax.inject.Inject
 
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.Tables.{FirstPartRow, UserRow}
-import models.{FirstPartRepo, Tables, UserRepoLike}
+import models.Tables
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -15,6 +15,7 @@ import views.html.helper.form
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import controllers.LoginController.LoginForm
+import repositories.{FirstPartRepo, UserRepoLike}
 
 /**
   * Created by shuhei.kitagawa on 2016/08/05.
@@ -28,14 +29,14 @@ class FirstPartController @Inject()(val firstPartRepo: FirstPartRepo,val userRep
 
     firstPartForm.bindFromRequest.fold(
       error => {
-        Future(Redirect(routes.UserController.show).flashing("error" -> "Your Tanka does not match our requirement..."))
+        Future(Redirect(routes.TimelineController.show).flashing("error" -> "Your Tanka does not match our requirement..."))
       },
       form =>{
         loggedIn match {
           case Some(user) => if(user.id == form.userId){
             val firstPart: FirstPartRow = FirstPartRow(0, form.userId.toInt,form.firstPartContentFirst,form.firstPartContentSecond,form.firstPartContentThird, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
             firstPartRepo.add(firstPart).map{
-              firstPartOp => Redirect(routes.UserController.show).flashing("success" -> "Your Tanka has been successfully posted!")
+              firstPartOp => Redirect(routes.TimelineController.show).flashing("success" -> "Your Tanka has been successfully posted!")
             }
           }else{
             Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
@@ -59,7 +60,7 @@ class FirstPartController @Inject()(val firstPartRepo: FirstPartRepo,val userRep
               Ok(views.html.firstPart.edit(form))
             }
           }
-          case _ => Redirect(routes.UserController.show)
+          case _ => Redirect(routes.TimelineController.show)
         }
       }
       case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
@@ -71,17 +72,17 @@ class FirstPartController @Inject()(val firstPartRepo: FirstPartRepo,val userRep
     // TODO createと処理共通化したい
     firstPartForm.bindFromRequest.fold(
       error => {
-        Future(Redirect(routes.UserController.show).flashing("error" -> "Your Tanka does not match our requirement..."))
+        Future(Redirect(routes.TimelineController.show).flashing("error" -> "Your Tanka does not match our requirement..."))
       },
       form =>{
         loggedIn match {
           case Some(user) => if(user.id == form.userId){
             val firstPart: FirstPartRow = FirstPartRow(form.id.get.toInt, form.userId.toInt,form.firstPartContentFirst,form.firstPartContentSecond,form.firstPartContentThird, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
             firstPartRepo.change(firstPart).map{
-              firstPartOp => Redirect(routes.UserController.show).flashing("success" -> "Your tanka has been successfully updated!")
+              firstPartOp => Redirect(routes.TimelineController.show).flashing("success" -> "Your tanka has been successfully updated!")
             }
           }else{
-            Future(Redirect(routes.UserController.show).flashing("error" -> "Goodbye bad boy..."))
+            Future(Redirect(routes.TimelineController.show).flashing("error" -> "Goodbye bad boy..."))
           }
           case None => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
         }
@@ -96,9 +97,9 @@ class FirstPartController @Inject()(val firstPartRepo: FirstPartRepo,val userRep
         fetchedFirstPart map{
           case f if f.get.userId == user.id => {
             firstPartRepo.remove(id)
-            Redirect(routes.UserController.show).flashing("success" -> "Your tanka has been successfully updated!")
+            Redirect(routes.TimelineController.show).flashing("success" -> "Your tanka has been successfully updated!")
           }
-          case _ => Redirect(routes.UserController.show).flashing("error" -> "Goodbye bad boy...")
+          case _ => Redirect(routes.TimelineController.show).flashing("error" -> "Goodbye bad boy...")
         }
       }
       case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))

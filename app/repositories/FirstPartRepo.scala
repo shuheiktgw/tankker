@@ -1,13 +1,15 @@
-package models
+package repositories
 
 import com.google.inject.Inject
+import models.Tables
 import models.Tables.FirstPart
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
-import slick.lifted.TableQuery
 import slick.driver.MySQLDriver.api._
-import scala.concurrent.{Await, Future}
+import slick.lifted.TableQuery
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Created by shuhei.kitagawa on 2016/08/04.
@@ -16,8 +18,12 @@ class FirstPartRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) exte
 
   val FirstPart = TableQuery[FirstPart]
 
-  def all(userId: Long): Future[Seq[Tables.FirstPartRow]] ={
+  def findByUserId(userId: Long): Future[Seq[Tables.FirstPartRow]] ={
     db.run(FirstPart.filter(_.userId === userId.toInt).sortBy(_.createdAt.desc).result)
+  }
+
+  def findByUserIds(userIds: Seq[Int]): Future[Seq[Tables.FirstPartRow]] = {
+    db.run(FirstPart.filter(_.userId inSetBind userIds).sortBy(_.createdAt.desc).result)
   }
 
   def findByID(id: Long): Future[Option[Tables.FirstPartRow]] = {

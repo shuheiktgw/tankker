@@ -1,15 +1,14 @@
-package models
+package repositories
 
 import com.google.inject.Inject
+import models.Tables
 import models.Tables.LastPart
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
-import slick.lifted.TableQuery
 import slick.driver.MySQLDriver.api._
-import scala.concurrent.{Await, Future}
+import slick.lifted.TableQuery
+
 import scala.concurrent.ExecutionContext.Implicits.global
-
-
 import scala.concurrent.Future
 
 /**
