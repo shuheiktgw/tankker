@@ -1,7 +1,7 @@
-@(user: models.Tables.UserRow, firstPartForm: Form[controllers.FirstPartController.FirstPartForm], tankas: Seq[(Tables.FirstPartRow, Seq[Tables.LastPartRow])], searchForm: Form[controllers.UserController.SearchForm])(implicit messages: Messages, flash: Flash)
+@(user: models.Tables.UserRow, firstPartForm: Form[controllers.FirstPartController.FirstPartForm], tankas: Seq[(Tables.FirstPartRow, Seq[Tables.LastPartRow])], searchForm: Form[controllers.UserController.SearchForm], profileNumbers: (Int, Int, Int))(implicit messages: Messages, flash: Flash)
 @import helper._
 
-@main("ユーザー詳細") {
+@main("タイムライン") {
     @flash.get("success").map { message =>
         <div class="alert alert-success" role="alert">
             @message
@@ -23,21 +23,21 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12 profile-name">
-                        <p>@@ @user.username</p>
+                        <p>@@@user.username</p>
                     </div>
                 </div>
                 <div class="row number-row">
                     <div class="col-md-4 profile-number">
                         <h3>ツイート</h3>
-                        <p>300</p>
+                        <a href="@routes.UserController.show(user.username)">@profileNumbers._1</a>
                     </div>
                     <div class="col-md-4 profile-number">
                         <h3>フォロー</h3>
-                        <p>300</p>
+                        <a href="@routes.FollowingController.followingIndex(user.id)">@profileNumbers._2</a>
                     </div>
                     <div class="col-md-4 profile-number">
                         <h3>フォロワー</h3>
-                        <p>300</p>
+                        <a href="@routes.FollowingController.followerIndex(user.id)">@profileNumbers._3</a>
                     </div>
                 </div>
             </div>
@@ -50,10 +50,10 @@
                                 @inputText(firstPartForm("firstPartContentFirst"), 'class -> "form-control", '_label -> null, 'placeholder -> "ガラス戸の", '_showConstraints -> false)
                                 </div>
                                 <div class="form-group tweet-form">
-                                @inputPassword(firstPartForm("firstPartContentSecond"),'class -> "form-control", '_label -> null, 'placeholder -> "外のつきよを", '_showConstraints -> false)
+                                @inputText(firstPartForm("firstPartContentSecond"),'class -> "form-control", '_label -> null, 'placeholder -> "外のつきよを", '_showConstraints -> false)
                                 </div>
                                 <div class="form-group tweet-form">
-                                @inputPassword(firstPartForm("firstPartContentThird"),'class -> "form-control", '_label -> null, 'placeholder -> "ながむれど", '_showConstraints -> false)
+                                @inputText(firstPartForm("firstPartContentThird"),'class -> "form-control", '_label -> null, 'placeholder -> "ながむれど", '_showConstraints -> false)
                                 </div>
                                 <input type="hidden" name="userId" value="@user.id" />
                                 <input type="submit" value="詠む" class="btn btn-blue900_rsd btn-block">
@@ -164,94 +164,23 @@
                     }
                 }
             </div>
-            <div class="col-md-3" style="background-color : #1b0733">
+            <div class="col-md-3">
                 <div class="row">
-                    <div class="col-md-8 col-md-offset-2" style="background-color : #000">
-                            tttttttttttttttt
+                    <div class="col-md-12 timeline-container">
+                    @form(routes.UserController.search, 'role -> "form") {
+                        <fieldset>
+                            <div class="form-group tweet-form-top">
+                            @inputText(searchForm("username"), 'class -> "form-control", '_label -> null, 'placeholder -> "ユーザー名で検索する", '_showConstraints -> false)
+                            </div>
+                            <div class="text-center">
+                                <input type="submit" value="検索" class="btn btn-blue900_rsd">
+                            </div>
+                        </fieldset>
+                    }
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
-
-
-    <div class="col-xs-6">
-
-
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>初句</th>
-                    <th>二句</th>
-                    <th>三句</th>
-                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>
-                </tr>
-            </thead>
-            <tbody>
-                @tankas.map { tanka =>
-                    <tr>
-                        <td>@tanka._1.firstPartContentFirst</td>
-                        <td>@tanka._1.firstPartContentSecond</td>
-                        <td>@tanka._1.firstPartContentThird</td>
-                        <td>
-                            <a href="@routes.LastPartController.brandNew(tanka._1.id.toLong)">
-                                <input type="submit" value="返歌" class="btn btn-danger btn-xs"/>
-                            </a>
-                        </td>
-                        <td>
-                        @if(user.id == tanka._1.userId) {
-                            <a href="@routes.FirstPartController.edit(tanka._1.id.toLong)">
-                                <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
-                            </a>
-                        }
-                        </td>
-                        <td>
-                        @if(user.id == tanka._1.userId) {
-                            @helper.form(routes.FirstPartController.delete(tanka._1.id)) {
-                                <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
-                            }
-                        }
-                        </td>
-                    </tr>
-                @tanka._2.map { henka =>
-                    <tr>
-                        <td>@henka.lastPartContentFirst</td>
-                        <td>@henka.lastPartContentSecond</td>
-                        <td>"後で直す"</td>
-                        <td>
-                        @if(user.id == henka.userId) {
-                            <a href="@routes.LastPartController.edit(henka.id.toLong)">
-                                <input type="submit" value="編集" class="btn btn-danger btn-xs"/>
-                            </a>
-                        }
-                        </td>
-                        <td>
-                        @if(user.id == henka.userId) {
-                            @helper.form(routes.LastPartController.delete(henka.id.toLong)) {
-                                <input type="submit" value="削除" class="btn btn-danger btn-xs"/>
-                            }
-                        }
-                        </td>
-                        <td>あとで直す</td>
-                    </tr>
-                }
-                }
-
-                @form(routes.UserController.search) {
-                    <fieldset>
-                        <div class="form-group">
-                        @inputText(searchForm("username"), '_label -> "User Name")
-                        </div>
-                        <div>
-                            <input type="submit" value="検索" class="btn btn-success">
-                        </div>
-                    </fieldset>
-                }
-            </tbody>
-        </table>
     </div>
 }
 
