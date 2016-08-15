@@ -187,6 +187,16 @@ span#logo { font-family: 'Abel', sans-serif;}
     width: 15px;
 }
 
+form:hover .tweet-icon{
+    cursor:pointer;
+    filter: alpha(opacity=60);        /* ie lt 8 */
+    -ms-filter: "alpha(opacity=60)";  /* ie 8 */
+    -moz-opacity:0.6;                 /* FF lt 1.5, Netscape */
+    -khtml-opacity: 0.6;              /* Safari 1.x */
+    opacity:0.6;
+    zoom:1;
+}
+
 a:hover img.tweet-icon{
     cursor:pointer;
     filter: alpha(opacity=60);        /* ie lt 8 */

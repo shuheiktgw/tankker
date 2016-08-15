@@ -40,10 +40,10 @@ class UserService @Inject()(val userRepo: UserRepo, val timelineService: Timelin
     }
   }
 
-  def fetchTankasForUserPage(userId: Long): Future[Seq[(Tables.FirstPartRow, Seq[Tables.LastPartRow])]] = {
+  def fetchTankasForUserPage(userId: Long): Future[Seq[((String, Tables.FirstPartRow), Seq[(String, Tables.LastPartRow)])]] = {
     firstPartRepo.findByUserId(userId).map{ firstParts =>
       firstParts map{ firstPart =>
-        (firstPart, Await.result(lastPartRepo.findByFirstPartId(firstPart.id), Duration.Inf))
+        ((Await.result(userRepo.findById(firstPart.userId), Duration.Inf).get.username, firstPart), Await.result(lastPartRepo.findByFirstPartId(firstPart.id), Duration.Inf).map(lastPartRow => (Await.result(userRepo.findById(lastPartRow.userId), Duration.Inf).get.username, lastPartRow)))
       }
     }
   }

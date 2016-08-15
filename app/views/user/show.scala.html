@@ -55,7 +55,7 @@
                         @if(!carrier.isMyself && carrier.isFollowing) {
                             @helper.form(routes.FollowingController.delete(carrier.requestedUser.id.toLong)) {
                                 <input type="submit" value="フォローを解除" class="btn btn-blue900_rsd btn-block">
-                            }
+                                }
                         }
                     </div>
                 </div>
@@ -84,23 +84,23 @@
                                             <img class="tweet-image" src="https://pbs.twimg.com/profile_images/442670117285933056/rA0-lbNb.jpeg" alt="basho">
                                         </div>
                                         <div class="col-md-12 tweet-profile-top">
-                                            <p>@@ @tanka._1.userId</p>
+                                            <p>@@@tanka._1._1</p>
                                         </div>
                                         <div class="col-md-12 tweet-profile-bottom">
-                                            <p>@tanka._1.createdAt.toLocalDateTime.toLocalDate</p>
+                                            <p>@tanka._1._2.createdAt.toLocalDateTime.toLocalDate</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
                                     <div class="row tweet-content">
                                         <div class="col-md-12">
-                                            <p>@tanka._1.firstPartContentFirst</p>
+                                            <p>@tanka._1._2.firstPartContentFirst</p>
                                         </div>
                                         <div class="col-md-12">
-                                            <p>@tanka._1.firstPartContentSecond</p>
+                                            <p>@tanka._1._2.firstPartContentSecond</p>
                                         </div>
                                         <div class="col-md-12">
-                                            <p>@tanka._1.firstPartContentThird</p>
+                                            <p>@tanka._1._2.firstPartContentThird</p>
                                         </div>
                                     </div>
                                 </div>
@@ -109,16 +109,18 @@
                                 <div class="col-md-10 col-md-offset-1">
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <a href="@routes.LastPartController.brandNew(tanka._1.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/henka.png")"></a>
+                                            <a href="@routes.LastPartController.brandNew(tanka._1._2.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/henka.png")"></a>
                                         </div>
                                         <div class="col-md-4">
-                                        @if(carrier.currentUser.id == tanka._1.userId) {
-                                            <a href="@routes.FirstPartController.edit(tanka._1.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/edit.png")"></a>
+                                        @if(carrier.currentUser.id == tanka._1._2.userId) {
+                                            <a href="@routes.FirstPartController.edit(tanka._1._2.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/edit.png")"></a>
                                         }
                                         </div>
                                         <div class="col-md-4">
-                                        @if(carrier.currentUser.id == tanka._1.userId) {
-                                            <a href="#"><img class="tweet-icon" src="@routes.Assets.at("images/delete.png")"></a>
+                                        @if(carrier.currentUser.id == tanka._1._2.userId) {
+                                            @helper.form(routes.FirstPartController.delete(tanka._1._2.id.toLong)) {
+                                                <input type="image" src="@routes.Assets.at("images/delete.png")" class="tweet-icon"/>
+                                            }
                                         }
                                         </div>
                                     </div>
@@ -136,20 +138,20 @@
                                             <img class="tweet-image" src="https://pbs.twimg.com/profile_images/442670117285933056/rA0-lbNb.jpeg" alt="basho">
                                         </div>
                                         <div class="col-md-12 tweet-profile-top">
-                                            <p>@@ @henka.userId</p>
+                                            <p>@@@henka._1</p>
                                         </div>
                                         <div class="col-md-12 tweet-profile-bottom">
-                                            <p>@henka.createdAt.toLocalDateTime.toLocalDate</p>
+                                            <p>@henka._2.createdAt.toLocalDateTime.toLocalDate</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
                                     <div class="row tweet-content">
                                         <div class="col-md-12">
-                                            <p>@henka.lastPartContentFirst</p>
+                                            <p>@henka._2.lastPartContentFirst</p>
                                         </div>
                                         <div class="col-md-12">
-                                            <p>@henka.lastPartContentSecond</p>
+                                            <p>@henka._2.lastPartContentSecond</p>
                                         </div>
                                     </div>
                                 </div>
@@ -160,13 +162,15 @@
                                         <div class="col-md-4">
                                         </div>
                                         <div class="col-md-4">
-                                        @if(carrier.currentUser.id == henka.userId) {
-                                            <a href="@routes.LastPartController.edit(henka.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/edit.png")"></a>
+                                        @if(carrier.currentUser.id == henka._2.userId) {
+                                            <a href="@routes.LastPartController.edit(henka._2.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/edit.png")"></a>
                                         }
                                         </div>
                                         <div class="col-md-4">
-                                        @if(carrier.currentUser.id == henka.userId) {
-                                            <a href="#"><img class="tweet-icon" src="@routes.Assets.at("images/delete.png")"></a>
+                                        @if(carrier.currentUser.id == henka._2.userId) {
+                                            @helper.form(routes.LastPartController.delete(henka._2.id.toLong)) {
+                                                <input type="image" src="@routes.Assets.at("images/delete.png")" class="tweet-icon"/>
+                                            }
                                         }
                                         </div>
                                     </div>

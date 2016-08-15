@@ -23,7 +23,7 @@ class TimelineController @Inject()(val timelineService: TimelineService, val use
   def show = AsyncStack{ implicit rs =>
     loggedIn match{
       case Some(user) =>{
-        val futureTankas: Future[Seq[(Tables.FirstPartRow, Seq[Tables.LastPartRow])]] = timelineService.fetchTankasForTimeline(user.id)
+        val futureTankas: Future[Seq[((String, Tables.FirstPartRow), Seq[(String, Tables.LastPartRow)])]] = timelineService.fetchTankasForTimeline(user.id)
         futureTankas.flatMap{ tankas =>
           timelineService.fetchProfileNumbers(user.id) map{ profileNumbers =>
             Ok(views.html.timeline.show(user, firstPartForm, tankas, searchForm, profileNumbers))
