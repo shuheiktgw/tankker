@@ -1,3 +1,82 @@
+html, body{
+    height: 100%;
+}
+
+#wrap{
+    width: 100%;
+    position: relative;
+    height:auto !important; /*IE6対策*/
+    height: 100%; /*IE6対策*/
+    min-height: 100%;
+}
+
+#contents{
+    padding-bottom:50px; /*フッターの高さと同じ*/
+}
+
+
+
+
+/*Header*/
+nav{
+    background-color: #19191A;
+    margin-bottom: 20px;
+}
+
+nav a{
+    color: #ffffff;
+    text-decoration: none;
+}
+
+nav a:hover{
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.nav-item-left{
+    float: left;
+}
+
+.nav-item-right{
+    float: right;
+}
+
+.logout{
+    font-weight: bold;
+    display: block;
+    margin-top: 15px;
+    margin-right: 15px;
+}
+
+
+.header-logo{
+    color: #ffffff;
+    text-decoration: none;
+    font-family: 'Abel', sans-serif;
+    font-weight: bold;
+    letter-spacing: 5px;
+    font-size: 30px;
+    display: block;
+    margin-top: 4px;
+
+    vertical-align: middle;
+}
+
+.header-img{
+    width: 30px;
+    margin: 10px
+}
+
+.clearfix:after {
+    display: block;
+    clear: both;
+    content: "";
+}
+
+ul{
+    list-style-type: none;
+}
+
 
 /*ロゴ*/
 span#logo { font-family: 'Abel', sans-serif;}
@@ -29,6 +108,10 @@ span#logo { font-family: 'Abel', sans-serif;}
 .number-row{
     border-top: solid  #E1E8ED 1.5px;
 }
+.profile-number{
+    text-align: center;
+}
+
 
 .profile-number h3{
     text-align: center;
@@ -36,8 +119,7 @@ span#logo { font-family: 'Abel', sans-serif;}
     font-size: 10px;
 }
 
-.profile-number p{
-    text-align: center;
+.profile-number a{
     font-weight: 900;
     font-size: 25px;
 }
@@ -118,4 +200,37 @@ a:hover img.tweet-icon{
 .henka-top{
     margin-top: 3px;
 }
+
+
+/*following index*/
+.following-index{
+    margin-top: 10px;
+}
+
+/*footer*/
+
+footer{
+    height:30px;
+    width: 100%;
+    position:absolute;
+    bottom:0;
+    background-color: #19191A;
+    text-align: center;
+}
+
+footer a{
+    display: block;
+    margin-top: 4px;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+footer a:hover{
+    display: block;
+    margin-top:4px;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+
 
