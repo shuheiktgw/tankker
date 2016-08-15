@@ -39,7 +39,7 @@ class UserController @Inject()(val userService: UserService, val userRepoLike: U
   def show(username: String) = AsyncStack { implicit rs =>
       loggedIn match {
         case Some(currentUser) => {
-          userService.showUserData(currentUser, username) map{
+          userService.fetchUserData(currentUser, username) map{
             case Some(carrier) => Ok(views.html.user.show(carrier))
             case _ => Redirect(routes.TimelineController.show).flashing("error" -> "指定されたユーザー名は存在しません")
           }

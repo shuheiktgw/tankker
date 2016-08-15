@@ -1,38 +1,61 @@
-@(userId: Long, followings: Seq[Tables.UserRow])(implicit messages: Messages, flash: Flash)
+@(currentUserId: Long, userId: Long, followings: Seq[(Tables.UserRow, (Int, Int, Int))])(implicit messages: Messages, flash: Flash)
 
-@main("フォロー一覧") {
-    @flash.get("success").map { message =>
-        <div class="alert alert-success" role="alert">
-            @message
-        </div>
-    }
+    @main("フォロー一覧") {
+        @flash.get("success").map { message =>
+            <div class="alert alert-success" role="alert">
+                @message
+            </div>
+        }
 
-    @flash.get("error").map { message =>
-        <div class="alert alert-danger" role="alert">
-            @message
-        </div>
-    }
+        @flash.get("error").map { message =>
+            <div class="alert alert-danger" role="alert">
+                @message
+            </div>
+        }
 
-    <div class="col-xs-6">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>User Name</th>
-                    <th>&nbsp;</th>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="container">
+            <div class="row">
             @followings.map { following =>
-                <tr>
-                    <td>@following.username</td>
-                    <td>@helper.form(routes.FollowingController.delete(following.id)){
-                        <input type="submit" value="フォローを解除" class="btn btn-danger btn-xs"/>
-                    }
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    </div>
+                <div class="col-md-3 col-md-offset-1">
+                    <div class="row profile-container following-index">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <img class="profile-image" src="https://pbs.twimg.com/profile_images/442670117285933056/rA0-lbNb.jpeg" alt="basho">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 profile-name">
+                                    <p>@@@following._1.username</p>
+                                </div>
+                            </div>
+                            <div class="row number-row">
+                                <div class="col-md-4 profile-number">
+                                    <h3>ツイート</h3>
+                                    <a href="@routes.UserController.show(following._1.username)">@following._2._1</a>
+                                </div>
+                                <div class="col-md-4 profile-number">
+                                    <h3>フォロー</h3>
+                                    <a href="@routes.FollowingController.followingIndex(following._1.id)">@following._2._2</a>
+                                </div>
+                                <div class="col-md-4 profile-number">
+                                    <h3>フォロワー</h3>
+                                    <a href="@routes.FollowingController.followerIndex(following._1.id)">@following._2._3</a>
+                                </div>
+                            </div>
+                        </div>
 
-}
+                        @if(currentUserId == userId) {
+                        <div class="col-md-12">
+                        @helper.form(routes.FollowingController.delete(following._1.id)) {
+                            <input type="submit" value="フォローを解除" class="btn btn-blue900_rsd btn-block">
+                            }
+                        </div>
+                        }
+                    </div>
+                </div>
+            }
+            </div>
+        </div>
+
+    }

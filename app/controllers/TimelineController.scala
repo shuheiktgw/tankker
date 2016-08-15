@@ -24,8 +24,10 @@ class TimelineController @Inject()(val timelineService: TimelineService, val use
     loggedIn match{
       case Some(user) =>{
         val futureTankas: Future[Seq[(Tables.FirstPartRow, Seq[Tables.LastPartRow])]] = timelineService.fetchTankasForTimeline(user.id)
-        futureTankas.map{ tankas =>
-          Ok(views.html.timeline.show(user, firstPartForm, tankas, searchForm))
+        futureTankas.flatMap{ tankas =>
+          timelineService.fetchProfileNumbers(user.id) map{ profileNumbers =>
+            Ok(views.html.timeline.show(user, firstPartForm, tankas, searchForm, profileNumbers))
+          }
         }
       }
       case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Please login!"))

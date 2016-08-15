@@ -16,9 +16,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by shuhei.kitagawa on 2016/08/09.
   */
-class UserService @Inject()(val userRepo: UserRepo, val followingRepo: FollowingRepo, val firstPartRepo: FirstPartRepo, val lastPartRepo: LastPartRepo) {
+class UserService @Inject()(val userRepo: UserRepo, val timelineService: TimelineService, val followingRepo: FollowingRepo, val firstPartRepo: FirstPartRepo, val lastPartRepo: LastPartRepo) {
 
-  def showUserData(currentUser: Tables.UserRow, username: String): Future[Option[UserShowCarrier]] = {
+  def fetchUserData(currentUser: Tables.UserRow, username: String): Future[Option[UserShowCarrier]] = {
     val futureRequestedUser: Future[Option[Tables.UserRow]] = userRepo.findByUsername(username)
 
     futureRequestedUser flatMap {
@@ -26,9 +26,11 @@ class UserService @Inject()(val userRepo: UserRepo, val followingRepo: Following
         val isMyself: Boolean = requestedUser.id == currentUser.id
         val isFollowing: Boolean = Await.result(followingRepo.findByUserIdAndFollowingUserId(currentUser.id, requestedUser.id), Duration.Inf).isDefined
 
-        fetchTankasForUserPage(requestedUser.id) map { tankas =>
-          val carrier: UserShowCarrier = UserShowCarrier(currentUser, requestedUser, firstPartForm, tankas, isMyself, isFollowing)
-          Some(carrier)
+        fetchTankasForUserPage(requestedUser.id) flatMap { tankas =>
+          timelineService.fetchProfileNumbers(requestedUser.id) map{ numbers =>
+            val carrier: UserShowCarrier = UserShowCarrier(currentUser, requestedUser, firstPartForm, numbers, tankas, isMyself, isFollowing)
+            Some(carrier)
+          }
         }
       }
 

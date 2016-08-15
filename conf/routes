@@ -7,7 +7,7 @@ GET     /                           controllers.Application.index
 
 # User
 GET         /users                  controllers.UserController.index
-GET         /users/:username         controllers.UserController.show(username: String)
+GET         /users/:username        controllers.UserController.show(username: String)
 GET         /user/new               controllers.UserController.brandNew
 POST        /user                   controllers.UserController.create
 GET         /user/edit              controllers.UserController.edit
@@ -37,8 +37,8 @@ POST        /henka/update           controllers.LastPartController.update(userId
 POST        /henka/delete           controllers.LastPartController.delete(id: Long)
 
 #Following
-GET         /followings             controllers.FollowingController.followingIndex
-GET         /followers              controllers.FollowingController.followerIndex
+GET         /followings             controllers.FollowingController.followingIndex(userId: Long)
+GET         /followers              controllers.FollowingController.followerIndex(userId: Long)
 POST        /following/create        controllers.FollowingController.create(id: Long)
 POST        /following/delete       controllers.FollowingController.delete(followingUserId: Long)
 POST        /follower/block         controllers.FollowingController.block(follower: Long)

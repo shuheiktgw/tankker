@@ -1,5 +1,6 @@
 @(title: String)(content: Html)
 
+
 <!DOCTYPE html>
 
 <html>
@@ -14,8 +15,37 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/cb-materialbtn.min.css")">
         <link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
     </head>
-    <body style="background-color: #F5F8FA">
+    <body style="background-color : #F5F8FA">
+        <div id="wrap">
+            <header>
+                <nav class="clearfix">
+                    <ul>
+                        <li class="nav-item-left">
+                            <a href="@routes.TimelineController.show">
+                                <img class="header-img" src="@routes.Assets.at("images/hude.png")">
+                            </a>
+                        </li>
+                        <li class="nav-item-left">
+                            <a class="header-logo" href="@routes.TimelineController.show">
+                            Tankker
+                            </a>
+                        </li>
+                        @if(!title.equals("ログイン") && !title.equals("ヨミビト新規作成")) {
+                            <li class="nav-item-right">
+                                <a class="logout" href="@routes.LoginController.delete">ログアウト</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </header>
 
-        @content
+            <div id="contents">
+            @content
+            </div>
+
+            <footer>
+                <a href="https://jp.linkedin.com/in/kitagawa-shuhei-5278a272">Copyright &copy; 2016 Shuhei Kitagawa All Rights Reserved.</a>
+            </footer>
+        </div>
     </body>
 </html>

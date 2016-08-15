@@ -1,50 +1,74 @@
-@(user: models.Tables.UserRow,lastPartForm: Form[controllers.LastPartController.LastPartForm], firstPart: Tables.FirstPartRow)(implicit messages: Messages, flash: Flash)
-@import helper._
+@(user: models.Tables.UserRow, lastPartForm: Form[controllers.LastPartController.LastPartForm], firstPart: Tables.FirstPartRow)(implicit messages: Messages, flash: Flash)
+    @import helper._
 
-@main("ユーザー詳細") {
-    @flash.get("success").map { message =>
-        <div class="alert alert-success" role="alert">
-            @message
-        </div>
-    }
-
-    @flash.get("error").map { message =>
-        <div class="alert alert-danger" role="alert">
-            @message
-        </div>
-    }
-
-    <div class="col-xs-6">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>初句</th>
-                    <th>二句</th>
-                    <th>三句</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>@firstPart.firstPartContentFirst</td>
-                    <td>@firstPart.firstPartContentSecond</td>
-                    <td>@firstPart.firstPartContentThird</td>
-                </tr>
-            </tbody>
-        </table>
-
-        @form(routes.LastPartController.create(user.id, firstPart.id)) {
-            <fieldset>
-                <div class="form-group">
-                @inputText(lastPartForm("lastPartContentFirst"), '_label -> "四句")
-                </div>
-                <div class="form-group">
-                @inputText(lastPartForm("lastPartContentSecond"), '_label -> "五句")
-                </div>
-                <div>
-                    <input type="submit" value="保存" class="btn btn-success">
-                </div>
-            </fieldset>
+    @main("返歌を詠む") {
+        @flash.get("success").map { message =>
+            <div class="alert alert-success" role="alert">
+                @message
+            </div>
         }
 
-    </div>
-}
+        @flash.get("error").map { message =>
+            <div class="alert alert-danger" role="alert">
+                @message
+            </div>
+        }
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <div class="row tweet-top">
+                        <div class="col-md-10 col-md-offset-1 timeline-container">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <img class="tweet-image" src="https://pbs.twimg.com/profile_images/442670117285933056/rA0-lbNb.jpeg" alt="basho">
+                                        </div>
+                                        <div class="col-md-12 tweet-profile-top">
+                                            <p>@@ @firstPart.userId</p>
+                                        </div>
+                                        <div class="col-md-12 tweet-profile-bottom">
+                                            <p>@firstPart.createdAt.toLocalDateTime.toLocalDate</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="row tweet-content">
+                                        <div class="col-md-12">
+                                            <p>@firstPart.firstPartContentFirst</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p>@firstPart.firstPartContentSecond</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p>@firstPart.firstPartContentThird</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <div class="row tweet-top">
+                            <div class="col-md-10 col-md-offset-1 timeline-container">
+                            @form(routes.LastPartController.create(user.id, firstPart.id), 'role -> "form") {
+                                <fieldset>
+                                    <div class="form-group tweet-form-top">
+                                    @inputText(lastPartForm("lastPartContentFirst"), 'class -> "form-control", '_label -> null, 'placeholder -> "ランプのかげの", '_showConstraints -> false)
+                                    </div>
+                                    <div class="form-group tweet-form">
+                                    @inputPassword(lastPartForm("lastPartContentSecond"), 'class -> "form-control", '_label -> null, 'placeholder -> "うつりて見えず", '_showConstraints -> false)
+                                    </div>
+                                    <input type="submit" value="返歌を詠む" class="btn btn-blue900_rsd btn-block">
+                                </fieldset>
+                            }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
