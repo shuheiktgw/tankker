@@ -8,4 +8,4 @@ import scala.concurrent.Future
 /**
   * Created by shuhei.kitagawa on 2016/08/09.
   */
-case class UserShowCarrier(currentUser: Tables.UserRow, requestedUser: Tables.UserRow, firstPartForm: Form[FirstPartForm], tankas: Seq[(Tables.FirstPartRow, Seq[Tables.LastPartRow])], isMyself: Boolean, isFollowing: Boolean)
+case class UserShowCarrier(currentUser: Tables.UserRow, requestedUser: Tables.UserRow, firstPartForm: Form[FirstPartForm],userNumbers:(Int, Int, Int), tankas: Seq[(Tables.FirstPartRow, Seq[Tables.LastPartRow])], isMyself: Boolean, isFollowing: Boolean)
