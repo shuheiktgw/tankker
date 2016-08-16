@@ -15,12 +15,13 @@ import views.html.helper.form
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import controllers.LoginController.LoginForm
-import repositories.{FirstPartRepo, UserRepoLike}
+import repositories.FirstPartRepo
+import services.UserServiceLike
 
 /**
   * Created by shuhei.kitagawa on 2016/08/05.
   */
-class FirstPartController @Inject()(val firstPartRepo: FirstPartRepo,val userRepoLike: UserRepoLike, val messagesApi: MessagesApi) extends Controller with I18nSupport with OptionalAuthElement with AuthConfigImpl{
+class FirstPartController @Inject()(val firstPartRepo: FirstPartRepo,val userServiceLike: UserServiceLike, val messagesApi: MessagesApi) extends Controller with I18nSupport with OptionalAuthElement with AuthConfigImpl{
 
   // TODO Auth周りのメソッド作ってすっきりさせたい
 

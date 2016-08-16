@@ -14,13 +14,13 @@ html, body{
     padding-bottom:50px; /*フッターの高さと同じ*/
 }
 
-
-
+.top-container{
+    margin-top: 40px;
+}
 
 /*Header*/
 nav{
     background-color: #19191A;
-    margin-bottom: 20px;
 }
 
 nav a{

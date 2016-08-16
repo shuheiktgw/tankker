@@ -52,6 +52,11 @@ class FollowingRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) exte
     db.run(Following.filter(row => row.userId === userId.toInt && row.followingUserId === followingUserId.toInt).result.headOption)
   }
 
+  // TODO これはRefactoaringごに上と統合する
+  def findByUserIdAndFollowingUserIdForUserService(userId: Long, followingUserId: Long) = {
+    Following.filter(row => row.userId === userId.toInt && row.followingUserId === followingUserId.toInt).result.headOption
+  }
+
   def findById(followingId: Long): Future[Option[FollowingRow]] = {
     db.run(Following.filter(_.id === followingId.toInt).result.headOption)
   }

@@ -20,7 +20,34 @@ class TimelineRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) exten
   val FirstPart = TableQuery[FirstPart]
   val LastPart = TableQuery[LastPart]
 
-  // タイムラインのプロフィールに必要な情報 ツイート数,フォロワー数,フォロー数
+  def countTweetNumbers(userId: Long): DBIO[Int] = {
+    (FirstPart.filter(_.userId === userId.toInt).length + LastPart.filter(_.userId === userId.toInt).length).result
+  }
+
+  def countFollowings(userId: Long): DBIO[Int] = {
+    Following.filter(_.userId === userId.toInt).length.result
+  }
+
+  def countFollowers(userId: Long): DBIO[Int] = {
+    Following.filter(_.followingUserId === userId.toInt).length.result
+  }
+
+  def fetchTweetForTimeline(userId: Long) = {
+    Following
+      .filter(following => following.userId === userId.toInt)
+      .join(User)
+      .on{case (following, firstUser) => following.followingUserId === firstUser.id}
+      .joinLeft(FirstPart)
+      .on{case((following,firstUser),firstPart) => firstUser.id === firstPart.userId}
+      .joinLeft(LastPart)
+      .on{case(((following,firstUser), firstPart), lastPart) => firstPart.map(_.id === lastPart.firstPartId)}
+      .join(User)
+      .on{case((((following,firstUser), firstPart), lastPart), lastUser) => lastPart.map(_.userId === lastUser.id)}
+      .map{case((((following,firstUser), firstPart), lastPart), lastUser) => ((firstPart, firstUser), lastPart, lastUser)}
+      .result
+  }
+
+
 
   def fetchProfileNumbers(userId: Long): (Future[Int], Future[Int], Future[Int]) ={
     val firstPartCount: Future[Int] = db.run(FirstPart.filter(_.userId === userId.toInt).length.result)

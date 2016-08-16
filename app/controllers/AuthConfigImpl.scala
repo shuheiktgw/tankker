@@ -1,13 +1,13 @@
 package controllers
 
 
-import jp.t2v.lab.play2.auth.AuthConfig
+import jp.t2v.lab.play2.auth.{AuthConfig, CookieTokenAccessor}
 import play.api.mvc.RequestHeader
 import play.api.mvc.Results._
 
 import scala.concurrent.{ExecutionContext, Future}
 import models.Tables
-import repositories.UserRepoLike
+import services.UserServiceLike
 //import jp.t2v.lab.play2.auth.sample.{Role, Account}
 //import jp.t2v.lab.play2.auth.sample.Role._
 import scala.reflect.{ClassTag, classTag}
@@ -17,7 +17,7 @@ import scala.reflect.{ClassTag, classTag}
   */
 trait AuthConfigImpl extends AuthConfig{
 
-  val userRepoLike: UserRepoLike
+  val userServiceLike: UserServiceLike
 
   // TODO Admin機能の実装
   type Authority = None.type
@@ -57,7 +57,7 @@ trait AuthConfigImpl extends AuthConfig{
     * ユーザIDからUserブジェクトを取得するアルゴリズムを指定します。
     * 任意の処理を記述してください。
     */
-  def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] = userRepoLike.findByUsername(id)
+  def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] = userServiceLike.findByUsername(id)
 
 
   /**
@@ -96,14 +96,13 @@ trait AuthConfigImpl extends AuthConfig{
     * SessionID Tokenの保存場所の設定です。
     * デフォルトでは Cookie を使用します。
     */
-//  override lazy val tokenAccessor = new CookieTokenAccessor(
-//    /*
-//     * cookie の secureオプションを使うかどうかの設定です。
-//     * デフォルトでは利便性のために false になっていますが、
-//     * 実際のアプリケーションでは true にすることを強く推奨します。
-//     */
-//    cookieSecureOption = play.api.Play.isProd(play.api.Play.current),
-//    cookieMaxAge       = Some(sessionTimeoutInSeconds)
-//  )
-
+  override lazy val tokenAccessor = new CookieTokenAccessor(
+    /*
+     * cookie の secureオプションを使うかどうかの設定です。
+     * デフォルトでは利便性のために false になっていますが、
+     * 実際のアプリケーションでは true にすることを強く推奨します。
+     */
+    cookieSecureOption = false,
+    cookieMaxAge       = Some(sessionTimeoutInSeconds)
+  )
 }

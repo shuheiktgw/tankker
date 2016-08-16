@@ -7,7 +7,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, Controller}
-import repositories.UserRepoLike
+import services.UserServiceLike
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by shuhei.kitagawa on 2016/08/03.
   */
-class LoginController @Inject()(val userRepoLike: UserRepoLike, val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with AuthConfigImpl {
+class LoginController @Inject()(val userServiceLike: UserServiceLike, val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with AuthConfigImpl {
 
   // TODO CSRF対策
   import LoginController._
@@ -28,7 +28,7 @@ class LoginController @Inject()(val userRepoLike: UserRepoLike, val messagesApi:
     loginForm.bindFromRequest.fold(
       error => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "ヨミビトメイもしくはアイコトバに間違いがあります")),
       form => {
-        userRepoLike.authenticate(form).flatMap {
+        userServiceLike.authenticate(form).flatMap {
           case Some(user) => gotoLoginSucceeded(user.username).map(_.flashing("success" -> "ログインに成功しました"))
           case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "ヨミビトメイもしくはアイコトバに間違いがあります"))
         }

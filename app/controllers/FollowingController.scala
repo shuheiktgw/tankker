@@ -6,8 +6,8 @@ import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.Tables
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Controller
-import repositories.{FirstPartRepo, UserRepoLike}
-import services.FollowingService
+import repositories.FirstPartRepo
+import services.{FollowingService, UserServiceLike}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by shuhei.kitagawa on 2016/08/08.
   */
-class FollowingController @Inject()(val followingService: FollowingService, firstPartRepo: FirstPartRepo,val userRepoLike: UserRepoLike, val messagesApi: MessagesApi) extends Controller with I18nSupport with OptionalAuthElement with AuthConfigImpl{
+class FollowingController @Inject()(val followingService: FollowingService, firstPartRepo: FirstPartRepo, val userServiceLike: UserServiceLike, val messagesApi: MessagesApi) extends Controller with I18nSupport with OptionalAuthElement with AuthConfigImpl{
 
   // TODO これ他のユーザーのフォロー状況見れるように,username引数に取ろう
   def followingIndex(userId: Long) = AsyncStack{ implicit rs =>

@@ -16,26 +16,31 @@
         </div>
     }
 
-    @* IDがある場合は更新処理、ない場合は登録処理を呼ぶ *@
-    @form(routes.UserController.update, 'class -> "container", 'role -> "form") {
-        <fieldset>
-            <div class="form-group">
-            @inputText(userForm("username"), '_label -> "UserName")
+    <div class="container top-container">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">ユーザー情報の更新</h3>
+                    </div>
+                    <div class="panel-body">
+                    @form(routes.UserController.update, 'role -> "form") {
+                        <fieldset>
+                            <div class="form-group">
+                            @inputText(userForm("username"), 'class -> "form-control", '_label -> null, 'placeholder -> "メールアドレス", '_showConstraints -> false)
+                            </div>
+                            <div class="form-group">
+                            @inputText(userForm("email"), 'class -> "form-control", '_label -> null, 'placeholder -> "ヨミビトメイ", '_showConstraints -> false)
+                            </div>
+                            <div class="form-group">
+                            @inputPassword(userForm("password"),'class -> "form-control", '_label -> null, 'placeholder -> "アイコトバ", '_showConstraints -> false)
+                            </div>
+                            <input type="submit" value="更新" class="btn btn-blue900_rsd btn-block">
+                        </fieldset>
+                    }
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-            @inputText(userForm("email"), '_label -> "Email")
-            </div>
-            <div class="form-group">
-            @inputText(userForm("password"), '_label -> "Password")
-            </div>
-            @* IDがある場合（更新の場合）のみhiddenを出力する *@
-            @userForm("id").value.map { value =>
-                <input type="hidden" name="id" value="@value" />
-            }
-            <div>
-                <input type="submit" value="保存" class="btn btn-success">
-            </div>
-        </fieldset>
-    }
-
+        </div>
+    </div>
 }

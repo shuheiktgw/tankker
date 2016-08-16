@@ -11,7 +11,8 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Controller
-import repositories.{FirstPartRepo, LastPartRepo, UserRepoLike}
+import repositories.{FirstPartRepo, LastPartRepo}
+import services.UserServiceLike
 import views.html.helper.form
 
 import scala.concurrent.Future
@@ -20,7 +21,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by Shuhei on 2016/08/07.
   */
-class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPartRepo: LastPartRepo, val userRepoLike: UserRepoLike, val messagesApi: MessagesApi) extends Controller with I18nSupport with OptionalAuthElement with AuthConfigImpl {
+class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPartRepo: LastPartRepo, val userServiceLike: UserServiceLike, val messagesApi: MessagesApi) extends Controller with I18nSupport with OptionalAuthElement with AuthConfigImpl {
 
   import controllers.LastPartController._
 

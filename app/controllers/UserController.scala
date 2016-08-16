@@ -15,8 +15,8 @@ import models.Tables.UserRow
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import repositories.{FirstPartRepo, FollowingRepo, UserRepo, UserRepoLike}
-import services.{TimelineService, UserService}
+import repositories.{FirstPartRepo, FollowingRepo, UserRepo}
+import services.{TimelineService, UserService, UserServiceLike}
 import slick.driver.JdbcProfile
 import views.models.UserShowCarrier
 
@@ -26,12 +26,12 @@ import scala.concurrent.{Await, Future}
 /**
   * Created by shuhei.kitagawa on 2016/08/02.
   */
-class UserController @Inject()(val userService: UserService, val userRepoLike: UserRepoLike, val usersRepo: UserRepo, val firstPartRepo: FirstPartRepo, val followingRepo: FollowingRepo , val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with OptionalAuthElement with AuthConfigImpl{
+class UserController @Inject()(val userService: UserService, val userServiceLike: UserServiceLike, val firstPartRepo: FirstPartRepo, val followingRepo: FollowingRepo, val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with OptionalAuthElement with AuthConfigImpl{
 
   // TODO Admin権限に設定
   // TODO FLGがtrue のユーザーがログイン出来ないようにしなくてはいけない
   def index = Action.async{ implicit rs =>
-    usersRepo.all().map{ users =>
+    userService.getAll.map{ users =>
       Ok(views.html.user.index(users))
     }
   }
@@ -62,7 +62,7 @@ class UserController @Inject()(val userService: UserService, val userRepoLike: U
       },
       form =>{
         val user = UserRow(0,form.username,form.email,form.password,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
-        usersRepo.add(user).flatMap { userOp =>
+        userService.add(user).flatMap { userOp =>
           gotoLoginSucceeded(user.username).map(_.flashing("success" -> "Tankkerへようこそ!"))
         }
       }
@@ -91,7 +91,7 @@ class UserController @Inject()(val userService: UserService, val userRepoLike: U
       form =>{
         val user = UserRow(form.id.get.toInt,form.username,form.email, form.password ,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
         // TODO usernameとemailが被ってた場合の処理を追加
-        usersRepo.change(user).map { _ =>
+        userService.change(user).map { _ =>
           Redirect(routes.UserController.show(user.username)).flashing("success" -> "Your info has been successfully updated")
         }
       }
@@ -101,7 +101,7 @@ class UserController @Inject()(val userService: UserService, val userRepoLike: U
   // TODO HTTPリクエストのメソッドをDeleteでRootを/userに変更
   def delete = AsyncStack { implicit rs =>
     loggedIn match{
-      case Some(user) => usersRepo.remove(user.id) map{
+      case Some(user) => userService.remove(user.id) map{
         // TODO 削除したユーザーの情報をFlashで表示
         // 削除する前に確認
         case Some(user) => Redirect(routes.LoginController.brandNew).flashing("success" -> "You have been successfully withdrawn from Tankker")
@@ -119,7 +119,7 @@ class UserController @Inject()(val userService: UserService, val userRepoLike: U
       form =>{
         loggedIn match{
           case Some(currentUser) => {
-            usersRepo.findByUsername(form.username) map {
+            userService.findByUsername(form.username) map {
               case Some(user) => Redirect(routes.UserController.show(form.username)).flashing("success" -> s"${form.username}のページに移動しました")
               case _ => Redirect(routes.TimelineController.show).flashing("error" -> "入力されたユーザー名は存在しません")
             }
