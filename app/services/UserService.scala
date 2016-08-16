@@ -81,12 +81,12 @@ class UserService @Inject()(val dbConfigProvider: DatabaseConfigProvider, val us
     }
   }
 
-  def fetchTankasForUserPage(requestedUserId: Long): Future[Map[Tables.FirstPartRow, Seq[(Option[Tables.LastPartRow], String)]]] = {
-    val tankaPairs: Future[Seq[(Tables.FirstPartRow, Option[Tables.LastPartRow], Tables.UserRow)]] = db.run(userRepo.fetchTankasForUserpage(requestedUserId))
+  def fetchTankasForUserPage(requestedUserId: Long): Future[Map[Tables.FirstPartRow, Seq[(Option[Tables.LastPartRow], Option[Tables.UserRow])]]] = {
+    val tankaPairs: Future[Seq[(Tables.FirstPartRow, Option[Tables.LastPartRow], Option[Tables.UserRow])]] = db.run(userRepo.fetchTankasForUserpage(requestedUserId))
     tankaPairs.map { pairs =>
-      val groupedTankas: Map[Tables.FirstPartRow, Seq[(Tables.FirstPartRow, Option[Tables.LastPartRow], Tables.UserRow)]] = pairs.groupBy(_._1)
+      val groupedTankas: Map[Tables.FirstPartRow, Seq[(Tables.FirstPartRow, Option[Tables.LastPartRow], Option[Tables.UserRow])]] = pairs.groupBy(_._1)
       groupedTankas.mapValues {
-        _.map { case (f, l, u) => (l, u.username) }
+        _.map { case (f, l, u) => (l, u) }
       }
     }
   }

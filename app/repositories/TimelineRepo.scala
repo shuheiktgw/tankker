@@ -32,16 +32,17 @@ class TimelineRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) exten
     Following.filter(_.followingUserId === userId.toInt).length.result
   }
 
+  //TODO どうやって自分のツイートを持ってくるかは後で調整する
   def fetchTweetForTimeline(userId: Long) = {
     Following
-      .filter(following => following.userId === userId.toInt)
+      .filter(following => following.userId === userId.toInt || following.followingUserId === userId.toInt)
       .join(User)
       .on{case (following, firstUser) => following.followingUserId === firstUser.id}
       .joinLeft(FirstPart)
       .on{case((following,firstUser),firstPart) => firstUser.id === firstPart.userId}
       .joinLeft(LastPart)
       .on{case(((following,firstUser), firstPart), lastPart) => firstPart.map(_.id === lastPart.firstPartId)}
-      .join(User)
+      .joinLeft(User)
       .on{case((((following,firstUser), firstPart), lastPart), lastUser) => lastPart.map(_.userId === lastUser.id)}
       .map{case((((following,firstUser), firstPart), lastPart), lastUser) => ((firstPart, firstUser), lastPart, lastUser)}
       .result

@@ -1,4 +1,4 @@
-@(user: models.Tables.UserRow, firstPartForm: Form[controllers.FirstPartController.FirstPartForm], tankas: Map[(Option[Tables.FirstPartRow], Tables.UserRow), Seq[(Option[Tables.LastPartRow], Tables.UserRow)]], searchForm: Form[controllers.UserController.SearchForm], profileNumbers: (Int, Int, Int))(implicit messages: Messages, flash: Flash)
+@(user: models.Tables.UserRow, firstPartForm: Form[controllers.FirstPartController.FirstPartForm], tankas: Map[(Option[Tables.FirstPartRow], Tables.UserRow), Seq[(Option[Tables.LastPartRow], Option[Tables.UserRow])]], searchForm: Form[controllers.UserController.SearchForm], profileNumbers: (Int, Int, Int))(implicit messages: Messages, flash: Flash)
     @import helper._
 
     @main("タイムライン") {
@@ -23,7 +23,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12 profile-name">
-                            <p>@@ @user.username</p>
+                            <p>@@@user.username</p>
                         </div>
                     </div>
                     <div class="row number-row">
@@ -72,7 +72,7 @@
                                                     <img class="tweet-image" src="https://pbs.twimg.com/profile_images/442670117285933056/rA0-lbNb.jpeg" alt="basho">
                                                 </div>
                                                 <div class="col-md-12 tweet-profile-top">
-                                                    <p>@@ @tanka._1._2.username</p>
+                                                    <p>@@@tanka._1._2.username</p>
                                                 </div>
                                                 <div class="col-md-12 tweet-profile-bottom">
                                                     <p>@tanka._1._1.get.createdAt.toLocalDateTime.toLocalDate</p>
@@ -127,7 +127,7 @@
                                                             <img class="tweet-image" src="https://pbs.twimg.com/profile_images/442670117285933056/rA0-lbNb.jpeg" alt="basho">
                                                         </div>
                                                         <div class="col-md-12 tweet-profile-top">
-                                                            <p>@@@henka._2.username</p>
+                                                            <p>@@@henka._2.get.username</p>
                                                         </div>
                                                         <div class="col-md-12 tweet-profile-bottom">
                                                             <p>@henka._1.get.createdAt.toLocalDateTime.toLocalDate</p>

@@ -31,9 +31,9 @@ class TimelineService @Inject()(val dbConfigProvider: DatabaseConfigProvider, va
     }
   }
 
-  def fetchTankasForTL(userId: Long): Future[Map[(Option[Tables.FirstPartRow], Tables.UserRow), Seq[(Option[Tables.LastPartRow], Tables.UserRow)]]] = {
+  def fetchTankasForTL(userId: Long): Future[Map[(Option[Tables.FirstPartRow], Tables.UserRow), Seq[(Option[Tables.LastPartRow], Option[Tables.UserRow])]]] = {
     db.run(timelineRepo.fetchTweetForTimeline(userId)).map{ pairs =>
-      val groupedPairs: Map[(Option[Tables.FirstPartRow], Tables.UserRow), Seq[((Option[Tables.FirstPartRow], Tables.UserRow), Option[Tables.LastPartRow], Tables.UserRow)]] = pairs.groupBy(_._1)
+      val groupedPairs: Map[(Option[Tables.FirstPartRow], Tables.UserRow), Seq[((Option[Tables.FirstPartRow], Tables.UserRow), Option[Tables.LastPartRow], Option[Tables.UserRow])]] = pairs.groupBy(_._1)
       groupedPairs mapValues{_.map{case((firstPart, firstUser), lastPart, lastUser) => (lastPart, lastUser)}}
     }
   }
