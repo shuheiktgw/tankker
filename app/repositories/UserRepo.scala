@@ -56,7 +56,7 @@ class UserRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends H
       .filter(_.userId === requestedUserId.toInt)
       .joinLeft(LastPart)
         .on { case (f,l) => f.id === l.firstPartId }
-      .join(User)
+      .joinLeft(User)
         .on { case ((f, l), u) => l.map(_.userId === u.id ) }
       .map{ case ((f, l), u) => (f, l, u) }
       .result
