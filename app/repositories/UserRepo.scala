@@ -61,6 +61,4 @@ class UserRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends H
       .map{ case ((f, l), u) => (f, l, u) }
       .result
   }
-
-
 }
