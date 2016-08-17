@@ -52,13 +52,28 @@ class UserRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends H
   }
 
   def fetchTankasForUserpage(requestedUserId: Long) = {
-    FirstPart
-      .filter(_.userId === requestedUserId.toInt)
+    User
+      .filter(_.id === requestedUserId.toInt)
+      .joinLeft(FirstPart)
+      .on { case (firstUser, firstPart) => firstUser.id === firstPart.userId }
       .joinLeft(LastPart)
-        .on { case (f,l) => f.id === l.firstPartId }
+      .on { case ((firstUser, firstPart), lastPart) => firstPart.map(_.id === lastPart.firstPartId) }
       .joinLeft(User)
-        .on { case ((f, l), u) => l.map(_.userId === u.id ) }
-      .map{ case ((f, l), u) => (f, l, u) }
+      .on { case (((firstUser, firstPart), lastPart), lastUser) => lastPart.map(_.userId === lastUser.id) }
+      .map { case (((firstUser, firstPart), lastPart), lastUser) => ((firstPart, firstUser), lastPart, lastUser) }
       .result
+    //
+    //
+    //
+    //    FirstPart
+    //      .filter(_.userId === requestedUserId.toInt)
+    //      .joinLeft(LastPart)
+    //        .on { case (f,l) => f.id === l.firstPartId }
+    //      .joinLeft(User)
+    //        .on { case ((f, l), u) => l.map(_.userId === u.id ) }
+    //      .map{ case ((f, l), u) => (f, l, u) }
+    //      .sortBy(_._1.createdAt.desc)
+    //      .result
+    //  }
   }
 }

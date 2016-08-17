@@ -81,13 +81,17 @@ class UserService @Inject()(val dbConfigProvider: DatabaseConfigProvider, val us
     }
   }
 
-  def fetchTankasForUserPage(requestedUserId: Long): Future[Map[Tables.FirstPartRow, Seq[(Option[Tables.LastPartRow], Option[Tables.UserRow])]]] = {
-    val tankaPairs: Future[Seq[(Tables.FirstPartRow, Option[Tables.LastPartRow], Option[Tables.UserRow])]] = db.run(userRepo.fetchTankasForUserpage(requestedUserId))
-    tankaPairs.map { pairs =>
-      val groupedTankas: Map[Tables.FirstPartRow, Seq[(Tables.FirstPartRow, Option[Tables.LastPartRow], Option[Tables.UserRow])]] = pairs.groupBy(_._1)
-      groupedTankas.mapValues {
-        _.map { case (f, l, u) => (l, u) }
-      }
+  def fetchTankasForUserPage(requestedUserId: Long): Future[Seq[((Option[Tables.FirstPartRow], Tables.UserRow), Seq[(Option[Tables.LastPartRow], Option[Tables.UserRow])])]] = {
+    db.run(userRepo.fetchTankasForUserpage(requestedUserId)).map{ pairs =>
+      val groupedPairs: Map[(Option[Tables.FirstPartRow], Tables.UserRow), Seq[((Option[Tables.FirstPartRow], Tables.UserRow), Option[Tables.LastPartRow], Option[Tables.UserRow])]] = pairs.groupBy(_._1)
+      val groupedMaps: Map[(Option[Tables.FirstPartRow], Tables.UserRow), Seq[(Option[Tables.LastPartRow], Option[Tables.UserRow])]] = groupedPairs.mapValues{_.map{case((firstPart, firstUser), lastPart, lastUser) => (lastPart, lastUser)}}
+      groupedMaps.toSeq.sortWith((a, b) => {
+        if (a._1._1.isDefined && b._1._1.isDefined) {
+          a._1._1.get.createdAt.after(b._1._1.get.createdAt)
+        } else {
+          false
+        }
+      })
     }
   }
 
@@ -101,12 +105,11 @@ class UserService @Inject()(val dbConfigProvider: DatabaseConfigProvider, val us
 
         val tweetsCount: Future[Int] = db.run(timelineRepo.countTweetNumbers(requestedUser.id))
         val followingsCount: Future[Int] = db.run(timelineRepo.countFollowings(requestedUser.id))
-        val followersCount: Future[Int] = db.run(timelineRepo.countFollowings(requestedUser.id))
+        val followersCount: Future[Int] = db.run(timelineRepo.countFollowers(requestedUser.id))
 
         val profileNumbers: Future[(Int, Int, Int)] = tweetsCount.flatMap(t => followingsCount.flatMap(fi => followersCount.map(fw => (t, fi, fw))))
 
         fetchTankasForUserPage(requestedUser.id) flatMap { tankas =>
-
           profileNumbers flatMap { numbers =>
             futureIsFollowing map { isFollowing =>
               val carrier: UserShowCarrier = UserShowCarrier(currentUser, requestedUser, firstPartForm, numbers, tankas, isMyself, isFollowing)

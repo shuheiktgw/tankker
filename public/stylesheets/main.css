@@ -99,8 +99,9 @@ span#logo { font-family: 'Abel', sans-serif;}
     height: 140px;
 }
 
-.profile-name  p{
+.profile-name  a{
     text-align: center;
+    display: block;
     font-weight: 700;
     font-size: 20px;
 }
@@ -144,10 +145,18 @@ span#logo { font-family: 'Abel', sans-serif;}
     margin-top: 20px;
 }
 
+.tweet-bottom{
+    margin-bottom: 20px;
+}
+
 .tweet-content{
     font-size: 20px;
     font-weight: bold;
     font-family: Quicksand, 游ゴシック体, 'Yu Gothic', YuGothic, 'ヒラギノ角ゴシック Pro', 'Hiragino Kaku Gothic Pro';
+}
+
+.user-show-tanka-set{
+    margin-top: 20px;
 }
 
 .tweet-image{
@@ -167,11 +176,13 @@ span#logo { font-family: 'Abel', sans-serif;}
     margin-top: -8px;
 }
 
-.tweet-profile-top p{
+.tweet-profile-top a{
+    display: block;
     text-align: center;
     vertical-align: middle;
     font-weight: 400;
     font-size: 15px;
+    margin-bottom: 9px;
 }
 
 .tweet-profile-bottom p{

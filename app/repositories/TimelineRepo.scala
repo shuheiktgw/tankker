@@ -6,6 +6,7 @@ import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 import slick.lifted.TableQuery
 import slick.driver.MySQLDriver.api._
+import java.sql.Timestamp
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.duration.Duration
@@ -32,10 +33,10 @@ class TimelineRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) exten
     Following.filter(_.followingUserId === userId.toInt).length.result
   }
 
-  //TODO どうやって自分のツイートを持ってくるかは後で調整する
+  //TODO こここれだと自分をフォローしているユーザーが一人もいないと自分のTweetも表示されないので必ず対応する
   def fetchTweetForTimeline(userId: Long) = {
     Following
-      .filter(following => following.userId === userId.toInt || following.followingUserId === userId.toInt)
+      .filter(following => following.userId === userId.toInt)
       .join(User)
       .on{case (following, firstUser) => following.followingUserId === firstUser.id}
       .joinLeft(FirstPart)
@@ -46,23 +47,6 @@ class TimelineRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) exten
       .on{case((((following,firstUser), firstPart), lastPart), lastUser) => lastPart.map(_.userId === lastUser.id)}
       .map{case((((following,firstUser), firstPart), lastPart), lastUser) => ((firstPart, firstUser), lastPart, lastUser)}
       .result
-  }
-
-
-
-  def fetchProfileNumbers(userId: Long): (Future[Int], Future[Int], Future[Int]) ={
-    val firstPartCount: Future[Int] = db.run(FirstPart.filter(_.userId === userId.toInt).length.result)
-    val lastPartCount: Future[Int] = db.run(LastPart.filter(_.userId === userId.toInt).length.result)
-    val tweetCount: Future[Int] = firstPartCount flatMap{ first =>
-      lastPartCount map{second =>
-        first + second
-      }
-    }
-
-
-    val followingCount: Future[Int] = db.run(Following.filter(_.userId === userId.toInt).length.result)
-    val followersCount: Future[Int] = db.run(Following.filter(_.followingUserId === userId.toInt).length.result)
-    (tweetCount, followingCount,followersCount)
   }
 }
 

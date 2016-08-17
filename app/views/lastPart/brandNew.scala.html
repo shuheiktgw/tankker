@@ -1,4 +1,4 @@
-@(user: models.Tables.UserRow, lastPartForm: Form[controllers.LastPartController.LastPartForm], firstPart: Tables.FirstPartRow)(implicit messages: Messages, flash: Flash)
+@(user: models.Tables.UserRow, lastPartForm: Form[controllers.LastPartController.LastPartForm], firstPart: Tables.FirstPartRow, owner: models.Tables.UserRow)(implicit messages: Messages, flash: Flash)
     @import helper._
 
     @main("返歌を詠む") {
@@ -26,7 +26,7 @@
                                             <img class="tweet-image" src="https://pbs.twimg.com/profile_images/442670117285933056/rA0-lbNb.jpeg" alt="basho">
                                         </div>
                                         <div class="col-md-12 tweet-profile-top">
-                                            <p>@@ @firstPart.userId</p>
+                                            <a href="@routes.UserController.show(owner.username)">@@@owner.username</a>
                                         </div>
                                         <div class="col-md-12 tweet-profile-bottom">
                                             <p>@firstPart.createdAt.toLocalDateTime.toLocalDate</p>

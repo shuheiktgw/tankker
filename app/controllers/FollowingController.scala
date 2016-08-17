@@ -43,7 +43,7 @@ class FollowingController @Inject()(val followingService: FollowingService, firs
     loggedIn match{
       case Some(user) => {
         val followingRow: Future[Tables.FollowingRow] = followingService.follow(user.id, followingUserId)
-        followingRow.map(_ => Redirect(routes.TimelineController.show).flashing("success" -> "You've successfully followed new user"))
+        followingRow.map(_ => Redirect(routes.TimelineController.show).flashing("success" -> "フォローしました"))
       }
       case _ => Future(Redirect(routes.TimelineController.show).flashing("error" -> "Your request is not right."))
     }
@@ -52,7 +52,7 @@ class FollowingController @Inject()(val followingService: FollowingService, firs
   def delete(followingUserId: Long) = AsyncStack{ implicit  rs =>
     loggedIn match{
       case Some(user) =>{
-        followingService.unfollow(user.id, followingUserId).map(_ => Redirect(routes.FollowingController.followingIndex(user.id)).flashing("success" -> "You've successfully unfollowed the user"))
+        followingService.unfollow(user.id, followingUserId).map(_ => Redirect(routes.TimelineController.show).flashing("success" -> "フォローを解除しました"))
       }
       case _ => Future(Redirect(routes.TimelineController.show).flashing("error" -> "Your request is not right."))
     }
@@ -62,7 +62,7 @@ class FollowingController @Inject()(val followingService: FollowingService, firs
     // TODO フラグ立てしてブロック機能を実装できるようにしたい
     loggedIn match{
       case Some(user) =>{
-        followingService.unfollow(userId, user.id).map(_ => Redirect(routes.FollowingController.followerIndex(user.id)).flashing("success" -> "You've successfully unfollowed the user"))
+        followingService.unfollow(userId, user.id).map(_ => Redirect(routes.TimelineController.show).flashing("success" -> "ユーザーのフォローをブロックしました"))
       }
       case _ => Future(Redirect(routes.TimelineController.show).flashing("error" -> "Your request is not right."))
     }

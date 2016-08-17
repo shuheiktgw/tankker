@@ -30,14 +30,14 @@ class FirstPartController @Inject()(val firstPartRepo: FirstPartRepo,val userSer
 
     firstPartForm.bindFromRequest.fold(
       error => {
-        Future(Redirect(routes.TimelineController.show).flashing("error" -> "Your Tanka does not match our requirement..."))
+        Future(Redirect(routes.TimelineController.show).flashing("error" -> "短歌が短すぎるか長すぎます"))
       },
       form =>{
         loggedIn match {
           case Some(user) => if(user.id == form.userId){
             val firstPart: FirstPartRow = FirstPartRow(0, form.userId.toInt,form.firstPartContentFirst,form.firstPartContentSecond,form.firstPartContentThird, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
             firstPartRepo.add(firstPart).map{
-              firstPartOp => Redirect(routes.TimelineController.show).flashing("success" -> "Your Tanka has been successfully posted!")
+              firstPartOp => Redirect(routes.TimelineController.show).flashing("success" -> "短歌を投稿しました")
             }
           }else{
             Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
@@ -73,14 +73,14 @@ class FirstPartController @Inject()(val firstPartRepo: FirstPartRepo,val userSer
     // TODO createと処理共通化したい
     firstPartForm.bindFromRequest.fold(
       error => {
-        Future(Redirect(routes.TimelineController.show).flashing("error" -> "Your Tanka does not match our requirement..."))
+        Future(Redirect(routes.TimelineController.show).flashing("error" -> "短歌が短すぎるか長すぎます"))
       },
       form =>{
         loggedIn match {
           case Some(user) => if(user.id == form.userId){
             val firstPart: FirstPartRow = FirstPartRow(form.id.get.toInt, form.userId.toInt,form.firstPartContentFirst,form.firstPartContentSecond,form.firstPartContentThird, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
             firstPartRepo.change(firstPart).map{
-              firstPartOp => Redirect(routes.TimelineController.show).flashing("success" -> "Your tanka has been successfully updated!")
+              firstPartOp => Redirect(routes.TimelineController.show).flashing("success" -> "短歌を更新しました")
             }
           }else{
             Future(Redirect(routes.TimelineController.show).flashing("error" -> "Goodbye bad boy..."))
@@ -98,7 +98,7 @@ class FirstPartController @Inject()(val firstPartRepo: FirstPartRepo,val userSer
         fetchedFirstPart map{
           case f if f.get.userId == user.id => {
             firstPartRepo.remove(id)
-            Redirect(routes.TimelineController.show).flashing("success" -> "Your tanka has been successfully updated!")
+            Redirect(routes.TimelineController.show).flashing("success" -> "短歌を削除しました")
           }
           case _ => Redirect(routes.TimelineController.show).flashing("error" -> "Goodbye bad boy...")
         }

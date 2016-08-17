@@ -92,7 +92,7 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
         val user = UserRow(form.id.get.toInt,form.username,form.email, form.password ,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
         // TODO usernameとemailが被ってた場合の処理を追加
         userService.change(user).map { _ =>
-          Redirect(routes.UserController.show(user.username)).flashing("success" -> "Your info has been successfully updated")
+          Redirect(routes.UserController.show(user.username)).flashing("success" -> "ユーザー情報を更新しました")
         }
       }
     )
@@ -104,7 +104,7 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
       case Some(user) => userService.remove(user.id) map{
         // TODO 削除したユーザーの情報をFlashで表示
         // 削除する前に確認
-        case Some(user) => Redirect(routes.LoginController.brandNew).flashing("success" -> "You have been successfully withdrawn from Tankker")
+        case Some(user) => Redirect(routes.LoginController.brandNew).flashing("success" -> "ログアウトしました")
         case None => Redirect(routes.LoginController.brandNew)
       }
     }

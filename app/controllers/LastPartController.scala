@@ -12,7 +12,7 @@ import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Controller
 import repositories.{FirstPartRepo, LastPartRepo}
-import services.UserServiceLike
+import services.{UserService, UserServiceLike}
 import views.html.helper.form
 
 import scala.concurrent.Future
@@ -21,7 +21,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by Shuhei on 2016/08/07.
   */
-class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPartRepo: LastPartRepo, val userServiceLike: UserServiceLike, val messagesApi: MessagesApi) extends Controller with I18nSupport with OptionalAuthElement with AuthConfigImpl {
+class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPartRepo: LastPartRepo, val userService: UserService, val userServiceLike: UserServiceLike, val messagesApi: MessagesApi) extends Controller with I18nSupport with OptionalAuthElement with AuthConfigImpl {
 
   import controllers.LastPartController._
 
@@ -29,13 +29,17 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
     loggedIn match {
       case Some(user) => {
         val firstPart: Future[Option[Tables.FirstPartRow]] = firstPartRepo.findByID(firstPartId)
-        firstPart map {
-          case Some(firstPart) => Ok(views.html.lastPart.brandNew(user, lastPartForm, firstPart))
-          case _ => Redirect(routes.TimelineController.show).flashing("error" -> "The Tanka does not exists...")
+        firstPart flatMap {
+          case Some(firstPart) => {
+            val firstPartOwner: Future[Option[Tables.UserRow]] = userService.findById(firstPart.userId)
+            firstPartOwner.map{
+              case Some(owner) => Ok(views.html.lastPart.brandNew(user, lastPartForm, firstPart, owner))
+              case _ => Redirect(routes.TimelineController.show).flashing("error" -> "The Tanka does not exists...")
+            }
+          }
+          case _ => Future(Redirect(routes.TimelineController.show).flashing("error" -> "The Tanka does not exists..."))
         }
-
       }
-      // TODO brandNewに引数必要?
       case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
     }
   }
@@ -44,14 +48,14 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
   def create(userId: Long, firstPartId: Long) = AsyncStack { implicit rs =>
     lastPartForm.bindFromRequest.fold(
       error => {
-        Future(Redirect(routes.LastPartController.brandNew(firstPartId)).flashing("error" -> "Your Henka does not match our requirement..."))
+        Future(Redirect(routes.LastPartController.brandNew(firstPartId)).flashing("error" -> "返歌が短すぎるか長すぎます"))
       },
       form => {
         loggedIn match {
           case Some(user) if user.id == userId => {
             val lastPart: LastPartRow = LastPartRow(0, userId.toInt, firstPartId.toInt, form.lastPartContentFirst, form.lastPartContentSecond, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
             lastPartRepo.reply(lastPart).map {
-              lastPartOp => Redirect(routes.TimelineController.show).flashing("success" -> "Your Henka has been successfully posted!")
+              lastPartOp => Redirect(routes.TimelineController.show).flashing("success" -> "返歌を投稿しました")
             }
           }
           case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
@@ -80,14 +84,14 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
     // TODO createと処理共通化したい
     lastPartForm.bindFromRequest.fold(
       error => {
-        Future(Redirect(routes.LastPartController.edit(lastPartId)).flashing("error" -> "Your Tanka does not match our requirement..."))
+        Future(Redirect(routes.LastPartController.edit(lastPartId)).flashing("error" -> "返歌が短すぎるか長すぎます"))
       },
       form => {
         loggedIn match {
           case Some(user) if user.id == userId => {
             val lastPart: LastPartRow = LastPartRow(lastPartId.toInt, userId.toInt, firstPartId.toInt, form.lastPartContentFirst, form.lastPartContentSecond, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
             lastPartRepo.change(lastPart).map {
-              lastPartOp => Redirect(routes.TimelineController.show).flashing("success" -> "Your Henka has been successfully updated!")
+              lastPartOp => Redirect(routes.TimelineController.show).flashing("success" -> "返歌を更新しました")
             }
           }
           case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
@@ -103,7 +107,7 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
         fetchedLastPart map{
           case f if f.get.userId == user.id => {
             lastPartRepo.remove(id)
-            Redirect(routes.TimelineController.show).flashing("success" -> "Your tanka has been successfully updated!")
+            Redirect(routes.TimelineController.show).flashing("success" -> "返歌を削除しました")
           }
           case _ => Redirect(routes.TimelineController.show).flashing("error" -> "Goodbye bad boy...")
         }
