@@ -73,7 +73,7 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
     Future{
       loggedIn match {
         case Some(user) => {
-          val form = userForm.fill(UserForm(Some(user.id), user.username, user.email, ""))
+          val form = userEditForm.fill(UserEditForm(user.email, ""))
           Ok(views.html.user.edit(form))
         }
         // TODO エラーページ作って遷移させたい
@@ -83,16 +83,20 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
   }
 
   def update = AsyncStack{ implicit rs =>
-    userForm.bindFromRequest.fold(
+    userEditForm.bindFromRequest.fold(
       error => {
-        Future(BadRequest(views.html.user.edit(userForm)))
+        Future(Redirect(routes.UserController.edit).flashing("error" -> "ユーザー情報に誤った値が含まれています"))
       },
-      // TODO LoggedIn でユーザー同じか確認
       form =>{
-        val user = UserRow(form.id.get.toInt,form.username,form.email, form.password ,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
-        // TODO usernameとemailが被ってた場合の処理を追加
-        userService.change(user).map { _ =>
-          Redirect(routes.UserController.show(user.username)).flashing("success" -> "ユーザー情報を更新しました")
+        loggedIn match{
+          case Some(currentUuser) =>{
+            val hasPasswordChanged: Boolean = form.password.isEmpty || form.password == null
+            val user = UserRow(currentUuser.id,currentUuser.username,form.email, form.password ,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
+            userService.change(user, hasPasswordChanged).map { _ =>
+              Redirect(routes.TimelineController.show).flashing("success" -> "ユーザー情報を更新しました")
+            }
+          }
+          case _ => Future(Redirect(routes.LoginController.brandNew))
         }
       }
     )
@@ -146,6 +150,16 @@ object UserController {
     )(UserForm.apply)(UserForm.unapply)
   )
 
+  case class UserEditForm(email: String, password: String)
+
+
+  val userEditForm = Form(
+    // TODO Passwordのバリデーション,8文字以下が入ってします
+    mapping(
+      "email" -> email,
+      "password" -> text(maxLength = 16)
+    )(UserEditForm.apply)(UserEditForm.unapply) verifying(fields => fields.password.isEmpty || fields.password == null || fields.password.length > 7)
+  )
   case class SearchForm(username: String)
 
   val searchForm = Form(
