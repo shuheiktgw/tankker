@@ -18,7 +18,7 @@ import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import repositories.{FirstPartRepo, FollowingRepo, UserRepo}
 import services.{TimelineService, UserService, UserServiceLike}
 import slick.driver.JdbcProfile
-import views.models.UserShowCarrier
+import views.models.UserHenkasCarrier
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -93,7 +93,7 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
       form =>{
         loggedIn match{
           case Some(currentUuser) =>{
-            val hasPasswordChanged: Boolean = form.password.isEmpty || form.password == null
+            val hasPasswordChanged: Boolean = !form.password.isEmpty && !(form.password == null)
             val user = UserRow(currentUuser.id,currentUuser.username,form.email, form.password ,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
             userService.change(user, hasPasswordChanged).map { _ =>
               Redirect(routes.TimelineController.show).flashing("success" -> "ユーザー情報を更新しました")
@@ -135,6 +135,18 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
         }
       }
     )
+  }
+
+  def henkas(username: String) = AsyncStack { implicit rs =>
+    loggedIn match {
+      case Some(currentUser) => {
+        userService.fetchUserDataForHenkas(currentUser, username) map{
+          case Some(carrier) => Ok(views.html.user.henkas(carrier))
+          case _ => Redirect(routes.TimelineController.show).flashing("error" -> "指定されたユーザー名は存在しません")
+        }
+      }
+      case _ => Future(Redirect(routes.LoginController.brandNew))
+    }
   }
 }
 

@@ -11,9 +11,9 @@ import com.github.t3hnar.bcrypt._
 import controllers.LoginController.LoginForm
 
 import scala.concurrent.duration.Duration
-import repositories.{FirstPartRepo, FollowingRepo, LastPartRepo, UserRepo, TimelineRepo}
+import repositories.{FirstPartRepo, FollowingRepo, LastPartRepo, TimelineRepo, UserRepo}
 import slick.driver.JdbcProfile
-import views.models.UserShowCarrier
+import views.models.{UserHenkasCarrier, UserShowCarrier}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -102,6 +102,10 @@ class UserService @Inject()(val dbConfigProvider: DatabaseConfigProvider, val us
     }
   }
 
+  def fetchHenkasForUserpage(requestedUserId: Long): Future[Seq[(Tables.UserRow, Tables.FirstPartRow, Tables.LastPartRow)]] = {
+    db.run(userRepo.fetchHenkasForUserpage(requestedUserId))
+  }
+
   def fetchUserData(currentUser: Tables.UserRow, username: String): Future[Option[UserShowCarrier]] = {
     val futureRequestedUser: Future[Option[Tables.UserRow]] = findByUsername(username)
 
@@ -118,9 +122,11 @@ class UserService @Inject()(val dbConfigProvider: DatabaseConfigProvider, val us
 
         fetchTankasForUserPage(requestedUser.id) flatMap { tankas =>
           profileNumbers flatMap { numbers =>
-            futureIsFollowing map { isFollowing =>
-              val carrier: UserShowCarrier = UserShowCarrier(currentUser, requestedUser, firstPartForm, numbers, tankas, isMyself, isFollowing)
-              Some(carrier)
+            futureIsFollowing flatMap { isFollowing =>
+              fetchUnfollowingUsers(currentUser.id).map{ unfollowedUsers =>
+                val carrier: UserShowCarrier = UserShowCarrier(currentUser, requestedUser, firstPartForm, numbers, tankas, isMyself, isFollowing, unfollowedUsers)
+                Some(carrier)
+              }
             }
           }
         }
@@ -130,6 +136,43 @@ class UserService @Inject()(val dbConfigProvider: DatabaseConfigProvider, val us
         Future(Option.empty[UserShowCarrier])
       }
     }
+  }
+
+  def fetchUserDataForHenkas(currentUser: Tables.UserRow, username: String): Future[Option[UserHenkasCarrier]] = {
+    val futureRequestedUser: Future[Option[Tables.UserRow]] = findByUsername(username)
+
+    futureRequestedUser flatMap {
+      case Some(requestedUser) => {
+        val isMyself: Boolean = requestedUser.id == currentUser.id
+        val futureIsFollowing: Future[Boolean] = db.run(followingRepo.findByUserIdAndFollowingUserIdForUserService(currentUser.id, requestedUser.id)).map(_.isDefined)
+
+        val tweetsCount: Future[Int] = db.run(timelineRepo.countTweetNumbers(requestedUser.id))
+        val followingsCount: Future[Int] = db.run(timelineRepo.countFollowings(requestedUser.id))
+        val followersCount: Future[Int] = db.run(timelineRepo.countFollowers(requestedUser.id))
+
+        val profileNumbers: Future[(Int, Int, Int)] = tweetsCount.flatMap(t => followingsCount.flatMap(fi => followersCount.map(fw => (t, fi, fw))))
+
+        fetchHenkasForUserpage(requestedUser.id) flatMap { henkas =>
+          profileNumbers flatMap { numbers =>
+            futureIsFollowing flatMap { isFollowing =>
+              fetchUnfollowingUsers(currentUser.id).map{ unfollowedUsers =>
+                val carrier: UserHenkasCarrier = UserHenkasCarrier(currentUser, requestedUser, firstPartForm, numbers, henkas, isMyself, isFollowing, unfollowedUsers)
+                Some(carrier)
+              }
+            }
+          }
+        }
+      }
+
+      case _ => {
+        Future(Option.empty[UserHenkasCarrier])
+      }
+    }
+  }
+
+
+  def fetchUnfollowingUsers(userId: Long): Future[Seq[Tables.UserRow]] = {
+    db.run(userRepo.fetchUnfollowingUsers(userId))
   }
 }
 

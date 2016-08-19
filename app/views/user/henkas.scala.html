@@ -1,4 +1,4 @@
-@(carrier: views.models.UserShowCarrier)(implicit messages: Messages, flash: Flash)
+@(carrier: views.models.UserHenkasCarrier)(implicit messages: Messages, flash: Flash)
     @import helper._
 
     @main("ユーザー詳細") {
@@ -76,8 +76,7 @@
                             </div>
                         </div>
                     </div>
-                    @carrier.tankas.map { tanka =>
-                        @if(tanka._1._1.isDefined) {
+                    @carrier.henkas.map { henka =>
                             <div class="row tweet-top">
                                 <div class="col-md-10 col-md-offset-1 timeline-container">
                                     <div class="row">
@@ -85,27 +84,27 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <img class="tweet-image" src="/assets/images/profile@{
-                                                        tanka._1._2.id % 10
+                                                        henka._1.id % 10
                                                     }.jpg" alt="basho">
                                                 </div>
                                                 <div class="col-md-12 tweet-profile-top">
-                                                    <a href="@routes.UserController.show(carrier.requestedUser.username)"> @@@carrier.requestedUser.username</a>
+                                                    <a href="@routes.UserController.show(henka._1.username)"> @@@carrier.requestedUser.username</a>
                                                 </div>
                                                 <div class="col-md-12 tweet-profile-bottom">
-                                                    <p>@tanka._1._1.get.createdAt.toLocalDateTime.toLocalDate</p>
+                                                    <p>@henka._2.createdAt.toLocalDateTime.toLocalDate</p>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-8">
                                             <div class="row tweet-content">
                                                 <div class="col-md-12">
-                                                    <p>@tanka._1._1.get.firstPartContentFirst</p>
+                                                    <p>@henka._2.firstPartContentFirst</p>
                                                 </div>
                                                 <div class="col-md-12">
-                                                    <p>@tanka._1._1.get.firstPartContentSecond</p>
+                                                    <p>@henka._2.firstPartContentSecond</p>
                                                 </div>
                                                 <div class="col-md-12">
-                                                    <p>@tanka._1._1.get.firstPartContentThird</p>
+                                                    <p>@henka._2.firstPartContentThird</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -114,16 +113,16 @@
                                         <div class="col-md-10 col-md-offset-1">
                                             <div class="row">
                                                 <div class="col-md-4">
-                                                    <a href="@routes.LastPartController.brandNew(tanka._1._1.get.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/henka.png")"></a>
+                                                    <a href="@routes.LastPartController.brandNew(henka._2.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/henka.png")"></a>
                                                 </div>
                                                 <div class="col-md-4">
-                                                @if(carrier.currentUser.id == tanka._1._1.get.userId) {
-                                                    <a href="@routes.FirstPartController.edit(tanka._1._1.get.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/edit.png")"></a>
+                                                @if(carrier.currentUser.id == henka._2.userId) {
+                                                    <a href="@routes.FirstPartController.edit(henka._2.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/edit.png")"></a>
                                                 }
                                                 </div>
                                                 <div class="col-md-4">
-                                                @if(carrier.currentUser.id == tanka._1._1.get.userId) {
-                                                    @helper.form(routes.FirstPartController.delete(tanka._1._1.get.id.toLong)) {
+                                                @if(carrier.currentUser.id == henka._2.userId) {
+                                                    @helper.form(routes.FirstPartController.delete(henka._2.id.toLong)) {
                                                         <input type="image" src="@routes.Assets.at("images/delete.png")" class="tweet-icon"/>
                                                     }
                                                 }
@@ -133,9 +132,6 @@
                                     </div>
                                 </div>
                             </div>
-                        }
-                        @tanka._2.map { henka =>
-                            @if(henka._1.isDefined) {
                                 <div class="row henka-top">
                                     <div class="col-md-10 col-md-offset-1 timeline-container">
                                         <div class="row">
@@ -143,24 +139,24 @@
                                                 <div class="row">
                                                     <div class="col-md-12">
                                                         <img class="tweet-image" src="/assets/images/profile@{
-                                                            henka._2.get.id % 10
+                                                            carrier.requestedUser.id % 10
                                                         }.jpg" alt="basho">
                                                     </div>
                                                     <div class="col-md-12 tweet-profile-top">
-                                                        <a href="@routes.UserController.show(henka._2.get.username)">@@@henka._2.get.username</a>
+                                                        <a href="@routes.UserController.show(carrier.requestedUser.username)">@@@carrier.requestedUser.username</a>
                                                     </div>
                                                     <div class="col-md-12 tweet-profile-bottom">
-                                                        <p>@henka._1.get.createdAt.toLocalDateTime.toLocalDate</p>
+                                                        <p>@henka._3.createdAt.toLocalDateTime.toLocalDate</p>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-8">
                                                 <div class="row tweet-content">
                                                     <div class="col-md-12">
-                                                        <p>@henka._1.get.lastPartContentFirst</p>
+                                                        <p>@henka._3.lastPartContentFirst</p>
                                                     </div>
                                                     <div class="col-md-12">
-                                                        <p>@henka._1.get.lastPartContentSecond</p>
+                                                        <p>@henka._3.lastPartContentSecond</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -171,13 +167,13 @@
                                                     <div class="col-md-4">
                                                     </div>
                                                     <div class="col-md-4">
-                                                    @if(carrier.currentUser.id == henka._1.get.userId) {
-                                                        <a href="@routes.LastPartController.edit(henka._1.get.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/edit.png")"></a>
+                                                    @if(carrier.currentUser.id == henka._3.userId) {
+                                                        <a href="@routes.LastPartController.edit(henka._3.id.toLong)"><img class="tweet-icon" src="@routes.Assets.at("images/edit.png")"></a>
                                                     }
                                                     </div>
                                                     <div class="col-md-4">
-                                                    @if(carrier.currentUser.id == henka._1.get.userId) {
-                                                        @helper.form(routes.LastPartController.delete(henka._1.get.id.toLong)) {
+                                                    @if(carrier.currentUser.id == henka._3.userId) {
+                                                        @helper.form(routes.LastPartController.delete(henka._3.id.toLong)) {
                                                             <input type="image" src="@routes.Assets.at("images/delete.png")" class="tweet-icon"/>
                                                         }
                                                     }
@@ -188,8 +184,6 @@
                                     </div>
                                 </div>
                             }
-                        }
-                    }
                 </div>
                 <div class="col-md-3">
                     <div class="col-md-12">

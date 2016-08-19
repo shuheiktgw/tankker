@@ -1,4 +1,4 @@
-@(user: models.Tables.UserRow, firstPartForm: Form[controllers.FirstPartController.FirstPartForm], tankas: Seq[((Option[Tables.FirstPartRow], Tables.UserRow), Seq[(Option[Tables.LastPartRow], Option[Tables.UserRow])])], searchForm: Form[controllers.UserController.SearchForm], profileNumbers: (Int, Int, Int))(implicit messages: Messages, flash: Flash)
+@(user: models.Tables.UserRow, firstPartForm: Form[controllers.FirstPartController.FirstPartForm], tankas: Seq[((Option[Tables.FirstPartRow], Tables.UserRow), Seq[(Option[Tables.LastPartRow], Option[Tables.UserRow])])], searchForm: Form[controllers.UserController.SearchForm], profileNumbers: (Int, Int, Int), unfollowings: Seq[Tables.UserRow])(implicit messages: Messages, flash: Flash)
     @import helper._
 
     @main("タイムライン") {
@@ -187,6 +187,45 @@
                         }
                         </div>
                     </div>
+                    <div class="row timeline-container recommended-user-in-timeline">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <spna class="recommended-user-title">あなたにおすすめのヨミビト</spna>
+                            </div>
+                        </div>
+                        @unfollowings.map { unfollowings =>
+                            <div class="row recommended-user">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-5">
+                                            <img class="recommended-profile-image" src="/assets/images/profile@{
+                                                unfollowings.id % 10
+                                            }.jpg" alt="basho">
+                                        </div>
+                                        <div class="col-md-7 recommended-profile-name">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <a href="@routes.UserController.show(unfollowings.username)">@@@unfollowings.username</a>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                @helper.form(routes.FollowingController.create(unfollowings.id.toLong)) {
+                                                    <input type="submit" value="フォロー" class="btn btn-blue900_rsd btn-block">
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+
                 </div>
             </div>
         </div>

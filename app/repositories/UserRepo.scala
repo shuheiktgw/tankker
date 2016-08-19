@@ -63,4 +63,29 @@ class UserRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends H
       .map { case (((firstUser, firstPart), lastPart), lastUser) => ((firstPart, firstUser), lastPart, lastUser) }
       .result
   }
+
+  def fetchHenkasForUserpage(requestedUserId: Long):DBIO[Seq[(Tables.UserRow, Tables.FirstPartRow, Tables.LastPartRow)]] = {
+    LastPart
+      .filter(_.userId === requestedUserId.toInt)
+      .join(FirstPart)
+      .on{case(lastPart,firstPart) => lastPart.firstPartId === firstPart.id}
+      .join(User)
+      .on{case((lastPart,firstPart), user) => firstPart.userId === user.id}
+      .sortBy{case((lastPart,firstPart), user) => lastPart.createdAt.desc}
+      .map{case((lastPart,firstPart), user) => (user, firstPart, lastPart)}
+      .result
+  }
+
+
+  def fetchUnfollowingUsers(userId: Long): DBIO[Seq[Tables.UserRow]] = {
+    Following
+      .filter(_.userId === userId.toInt)
+      .joinRight(User)
+      .on{case(following, user) => following.followingUserId === user.id}
+      .filter{case(following, user) => following.isEmpty}
+      .filterNot{case(following, user) => user.id === userId.toInt}
+      .sortBy{case(following, user) => user.createdAt.desc}
+      .map{case(following, user) => user}
+      .result.map(_.take(5))
+  }
 }

@@ -272,6 +272,43 @@ a:hover img.tweet-icon{
     margin-top: 3px;
 }
 
+.recommended-user{
+    margin-top: 20px;
+}
+
+.recommended-user-title{
+    font-weight: bold;
+    font-size: 15px;
+    color: #c0c0c0;
+    text-align: center;
+}
+
+.recommended-profile-image {
+    border-radius: 50%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90px;
+    height: 90px;
+}
+
+.recommended-profile-name  a{
+    text-align: center;
+    display: block;
+    font-weight: 700;
+    font-size: 20px;
+    margin-top: 13px;
+    margin-bottom: 5px;
+}
+
+.recommended-user-in-timeline {
+    margin-top: 20px;
+}
+
+.user-show-nav{
+    font-weight: 700;
+}
+
 
 /*following index*/
 .following-index{
