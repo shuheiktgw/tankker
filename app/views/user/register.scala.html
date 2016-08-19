@@ -1,7 +1,7 @@
 @(userForm: Form[controllers.UserController.UserForm])(implicit messages: Messages, flash: Flash)
 @import helper._
 
-@main("ヨミビト新規作成") {
+@main("Tankker") {
 @flash.get("success").map { message =>
             <div class="alert alert-success" role="alert">
                 @message
@@ -16,10 +16,23 @@
 
      <div class="container top-container">
             <div class="row">
-                <div class="col-md-4 col-md-offset-4">
+                <div class="col-md-8">
+                    <div class="lp-explanation">
+                        <div class="lp-title">
+                            <h2>Tanka is Beautiful.</h2>
+                        </div>
+                        <div class="lp-detail">
+                            <p><span class="logo-in-detail">Tankker</span>は世界ではじめての,短歌でコミュニケーションをとるSNSです.</p>
+                            <p>上の句や下の句を詠むことで,世界中の人と交流することができます.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                </div>
+                <div class="col-md-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h3 class="panel-title">ようこそ <span id="logo">Tankker</span> へ</h3>
+                            <h3 class="panel-title">ようこそ <span id="logo">Tankker</span> の世界へ</h3>
                         </div>
                         <div class="panel-body">
                             @form(routes.UserController.create, 'role -> "form") {
@@ -28,12 +41,12 @@
                                     @inputText(userForm("email"), 'class -> "form-control", '_label -> null, 'placeholder -> "メールアドレス", '_showConstraints -> false)
                                     </div>
                                     <div class="form-group">
-                                    @inputText(userForm("username"), 'class -> "form-control", '_label -> null, 'placeholder -> "ヨミビトメイ", '_showConstraints -> false)
+                                    @inputText(userForm("username"), 'class -> "form-control", '_label -> null, 'placeholder -> "ヨミビトメイ (半角16文字以下)", '_showConstraints -> false)
                                     </div>
                                     <div class="form-group">
-                                    @inputPassword(userForm("password"),'class -> "form-control", '_label -> null, 'placeholder -> "アイコトバ", '_showConstraints -> false)
+                                    @inputPassword(userForm("password"),'class -> "form-control", '_label -> null, 'placeholder -> "パスワード (半角8文字以上,16文字以下)", '_showConstraints -> false)
                                     </div>
-                                    <input type="submit" value="ヨミビトの新規作成" class="btn btn-blue900_rsd btn-block">
+                                    <input type="submit" value="Tankkerをはじめる" class="btn btn-blue900_rsd btn-block">
                                 </fieldset>
                             }
                         </div>

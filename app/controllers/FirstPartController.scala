@@ -117,9 +117,9 @@ object FirstPartController{
       "id" -> optional(longNumber),
       // TODO userIDがrequiredになってない
       "userId" -> longNumber,
-      "firstPartContentFirst" -> nonEmptyText(3, 15),
-      "firstPartContentSecond" -> nonEmptyText(5, 17),
-      "firstPartContentThird" -> nonEmptyText(3, 15)
+      "firstPartContentFirst" -> nonEmptyText(2, 15),
+      "firstPartContentSecond" -> nonEmptyText(3, 20),
+      "firstPartContentThird" -> nonEmptyText(2, 15)
     )(FirstPartForm.apply)(FirstPartForm.unapply)
   )
 

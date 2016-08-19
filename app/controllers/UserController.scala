@@ -52,9 +52,11 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
   // TODO メソッド名変更
   import UserController._
   def brandNew = Action.async{ implicit rs =>
-    Future(Ok(views.html.user.brandNew(userForm)))
+    Future(Ok(views.html.user.register(userForm)))
   }
 
+
+  //TODO ユーザー名前のバリデーションを行う
   def create = AsyncStack{ implicit rs =>
     userForm.bindFromRequest.fold(
       error => {
@@ -62,8 +64,9 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
       },
       form =>{
         val user = UserRow(0,form.username,form.email,form.password,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
-        userService.add(user).flatMap { userOp =>
-          gotoLoginSucceeded(user.username).map(_.flashing("success" -> "Tankkerへようこそ!"))
+        userService.add(user).flatMap {
+          case Some(user) => gotoLoginSucceeded(user.username).map(_.flashing("success" -> "Tankkerへようこそ!"))
+          case _ => Future(Redirect(routes.UserController.brandNew).flashing("error" -> "Emailもしくはユーザー名が既に存在しています"))
         }
       }
     )

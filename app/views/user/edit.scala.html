@@ -1,4 +1,4 @@
-@(userForm: Form[controllers.UserController.UserForm])(implicit messages: Messages, flash: Flash)
+@(userEditForm: Form[controllers.UserController.UserEditForm])(implicit messages: Messages, flash: Flash)
 
 @* テンプレートで利用可能なヘルパーをインポート *@
 @import helper._
@@ -27,13 +27,10 @@
                     @form(routes.UserController.update, 'role -> "form") {
                         <fieldset>
                             <div class="form-group">
-                            @inputText(userForm("username"), 'class -> "form-control", '_label -> null, 'placeholder -> "メールアドレス", '_showConstraints -> false)
+                            @inputText(userEditForm("email"), 'class -> "form-control", '_label -> null, 'placeholder -> "メールアドレス", '_showConstraints -> false)
                             </div>
                             <div class="form-group">
-                            @inputText(userForm("email"), 'class -> "form-control", '_label -> null, 'placeholder -> "ヨミビトメイ", '_showConstraints -> false)
-                            </div>
-                            <div class="form-group">
-                            @inputPassword(userForm("password"),'class -> "form-control", '_label -> null, 'placeholder -> "アイコトバ", '_showConstraints -> false)
+                            @inputPassword(userEditForm("password"),'class -> "form-control", '_label -> null, 'placeholder -> "アイコトバ", '_showConstraints -> false)
                             </div>
                             <input type="submit" value="更新" class="btn btn-blue900_rsd btn-block">
                         </fieldset>

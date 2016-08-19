@@ -15,7 +15,11 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/cb-materialbtn.min.css")">
         <link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
     </head>
-    <body style="background-color : #F5F8FA">
+    @if(title.equals("Tankker")){
+        <body class="register">
+    }else{
+        <body style="background-color : #F5F8FA">
+    }
         <div id="wrap">
             <header>
                 <nav class="clearfix">
@@ -30,7 +34,7 @@
                             Tankker
                             </a>
                         </li>
-                        @if(!title.equals("ログイン") && !title.equals("ヨミビト新規作成")) {
+                        @if(!title.equals("ログイン") && !title.equals("Tankker")) {
                             <li class="nav-item-right">
                                 <a class="logout" href="@routes.LoginController.delete">ログアウト</a>
                             </li>

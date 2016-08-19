@@ -1,5 +1,12 @@
 html, body{
     height: 100%;
+    font-family: Quicksand, 游ゴシック体, 'Yu Gothic', YuGothic, 'ヒラギノ角ゴシック Pro', 'Hiragino Kaku Gothic Pro';
+}
+
+body{
+    background-image: url("../images/background.jpg");
+    -moz-background-size:cover;
+    background-size:cover;
 }
 
 #wrap{
@@ -79,7 +86,50 @@ ul{
 
 
 /*ロゴ*/
-span#logo { font-family: 'Abel', sans-serif;}
+span#logo {
+    color: #19191A;
+    font-family: 'Abel', sans-serif;
+    font-weight: bold;
+    letter-spacing: 2px;
+    font-size: 25px;
+}
+
+span.logo-in-detail{
+    font-family: 'Abel', sans-serif;
+    font-weight: bold;
+    letter-spacing: 2px;
+    font-size: 30px;
+}
+
+/*LP*/
+.register{
+    background-image: url("../images/japanese-style_1.jpg");
+    background-size:cover;
+}
+
+.lp-title h2{
+    font-weight: bold;
+    font-size: 50px;
+    color: #ffffff;
+}
+
+.lp-detail{
+    margin-top: 20px;
+}
+
+.lp-detail p{
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: 1px;
+    color: #ffffff;
+}
+
+
+
+
+
+
+
 
 /*profile*/
 .profile-container{

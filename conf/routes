@@ -3,12 +3,11 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
+GET     /                           controllers.UserController.brandNew
 
 # User
 GET         /users                  controllers.UserController.index
 GET         /users/:username        controllers.UserController.show(username: String)
-GET         /user/new               controllers.UserController.brandNew
 POST        /user                   controllers.UserController.create
 GET         /user/edit              controllers.UserController.edit
 POST        /user/update            controllers.UserController.update

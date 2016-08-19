@@ -54,12 +54,19 @@ class UserService @Inject()(val dbConfigProvider: DatabaseConfigProvider, val us
     futureResult.map(_.isDefined)
   }
 
-  def change(user: Tables.UserRow): Future[Option[Tables.UserRow]] = {
+  def change(user: Tables.UserRow, hasPasswordChanged: Boolean = false): Future[Option[Tables.UserRow]] = {
     userExists(user) flatMap {
       case true => Future(Option.empty[Tables.UserRow])
       case _ => {
-        val encryptedUser: UserRow = user.copy(password = user.password.bcrypt)
-        db.run(userRepo.change(encryptedUser)).map(_ => Option(encryptedUser))
+        if(hasPasswordChanged) {
+          val encryptedUser: UserRow = user.copy(password = user.password.bcrypt)
+          db.run(userRepo.change(encryptedUser)).map(_ => Option(encryptedUser))
+        }else{
+          findById(user.id).flatMap{ fetchedUser =>
+            val encryptedUser: UserRow = user.copy(password = fetchedUser.get.password)
+            db.run(userRepo.change(encryptedUser)).map(_ => Option(encryptedUser))
+          }
+        }
       }
     }
   }
