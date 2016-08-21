@@ -15,11 +15,17 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/cb-materialbtn.min.css")">
         <link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
     </head>
+
     @if(title.equals("Tankker")){
         <body class="register">
     }else{
-        <body style="background-color : #F5F8FA">
+        @if(title.equals("Secret")){
+            <body class="tinder">
+        }else{
+            <body style="background-color : #F5F8FA">
+        }
     }
+
         <div id="wrap">
             <header>
                 <nav class="clearfix">

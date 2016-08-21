@@ -124,6 +124,11 @@ span.logo-in-detail{
     color: #ffffff;
 }
 
+.tinder{
+    background-image: url("../images/tinder.jpg");
+    background-size:cover;
+}
+
 
 
 

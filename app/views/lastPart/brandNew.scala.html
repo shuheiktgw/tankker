@@ -23,7 +23,7 @@
                                 <div class="col-md-4">
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <img class="tweet-image" src="/assets/images/profile@{user.id}.jpg" alt="basho">
+                                            <img class="tweet-image" src="/assets/images/profile@{firstPart.userId % 10}.jpg" alt="basho">
                                         </div>
                                         <div class="col-md-12 tweet-profile-top">
                                             <a href="@routes.UserController.show(owner.username)">@@@owner.username</a>
