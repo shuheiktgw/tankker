@@ -22,13 +22,7 @@ class TimelineService @Inject()(val dbConfigProvider: DatabaseConfigProvider, va
     val followingsTankas = db.run(timelineRepo.fetchTweetForTimeline(userId)).map{ pairs =>
       val groupedPairs: Map[(Option[Tables.FirstPartRow], Tables.UserRow), Seq[((Option[Tables.FirstPartRow], Tables.UserRow), Option[Tables.LastPartRow], Option[Tables.UserRow])]] = pairs.groupBy(_._1)
       val groupedMaps: Map[(Option[Tables.FirstPartRow], Tables.UserRow), Seq[(Option[Tables.LastPartRow], Option[Tables.UserRow])]] = groupedPairs.mapValues{_.map{case((firstPart, firstUser), lastPart, lastUser) => (lastPart, lastUser)}}
-      groupedMaps.toSeq.sortWith((a, b) => {
-        if (a._1._1.isDefined && b._1._1.isDefined) {
-          a._1._1.get.createdAt.after(b._1._1.get.createdAt)
-        } else {
-          false
-        }
-      })
+      groupedMaps.toSeq
     }
 
     val myTankas = userService.fetchTankasForUserPage(userId)
@@ -36,13 +30,13 @@ class TimelineService @Inject()(val dbConfigProvider: DatabaseConfigProvider, va
 
     followingsTankas.flatMap { following =>
       myTankas.map{ mine =>
-        (following ++ mine).sortWith((a, b) => {
-          if (a._1._1.isDefined && b._1._1.isDefined) {
-            a._1._1.get.createdAt.after(b._1._1.get.createdAt)
+        (following ++ mine).sortWith{case (((firstPart1, firstUser1), lastParts1), ((firstPart2, firstUser2), lastParts2)) => {
+          if (firstPart1.isDefined && firstPart2.isDefined) {
+            firstPart1.get.createdAt.after(firstPart2.get.createdAt)
           } else {
-            false
+            true
           }
-        })
+        }}
       }
     }
   }

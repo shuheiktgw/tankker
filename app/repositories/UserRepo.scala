@@ -61,7 +61,8 @@ class UserRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends H
       .joinLeft(User)
       .on { case (((firstUser, firstPart), lastPart), lastUser) => lastPart.map(_.userId === lastUser.id) }
       .map { case (((firstUser, firstPart), lastPart), lastUser) => ((firstPart, firstUser), lastPart, lastUser) }
-      .result
+      .sortBy{case ((firstPart, firstUser), lastPart, lastUser) => firstPart.map(_.createdAt).desc}
+      .result.map(_.take(30))
   }
 
   def fetchHenkasForUserpage(requestedUserId: Long):DBIO[Seq[(Tables.UserRow, Tables.FirstPartRow, Tables.LastPartRow)]] = {
@@ -73,7 +74,8 @@ class UserRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends H
       .on{case((lastPart,firstPart), user) => firstPart.userId === user.id}
       .sortBy{case((lastPart,firstPart), user) => lastPart.createdAt.desc}
       .map{case((lastPart,firstPart), user) => (user, firstPart, lastPart)}
-      .result
+      .sortBy{case (user, firstPart, lastPart) => firstPart.createdAt.desc}
+      .result.map(_.take(30))
   }
 
 

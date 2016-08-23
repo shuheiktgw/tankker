@@ -41,12 +41,13 @@
                                     @inputText(userForm("email"), 'class -> "form-control", '_label -> null, 'placeholder -> "メールアドレス", '_showConstraints -> false)
                                     </div>
                                     <div class="form-group">
-                                    @inputText(userForm("username"), 'class -> "form-control", '_label -> null, 'placeholder -> "ヨミビトメイ (半角16文字以下)", '_showConstraints -> false)
+                                    @inputText(userForm("username"), 'class -> "form-control", '_label -> null, 'placeholder -> "歌人名 (半角16文字以下)", '_showConstraints -> false)
                                     </div>
                                     <div class="form-group">
                                     @inputPassword(userForm("password"),'class -> "form-control", '_label -> null, 'placeholder -> "パスワード (半角8文字以上,16文字以下)", '_showConstraints -> false)
                                     </div>
                                     <input type="submit" value="Tankkerをはじめる" class="btn btn-blue900_rsd btn-block">
+                                    <p>以前に登録した? <a href="@routes.LoginController.brandNew">ログインする</a></p>
                                 </fieldset>
                             }
                         </div>

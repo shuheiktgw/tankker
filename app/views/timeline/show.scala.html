@@ -2,6 +2,10 @@
     @import helper._
 
     @main("タイムライン") {
+
+
+
+
         @flash.get("success").map { message =>
             <div class="alert alert-success" role="alert">
                 @message
@@ -28,15 +32,15 @@
                     </div>
                     <div class="row number-row">
                         <div class="col-md-4 profile-number">
-                            <h3>ツイート</h3>
+                            <h3>短歌</h3>
                             <a href="@routes.UserController.show(user.username)">@profileNumbers._1</a>
                         </div>
                         <div class="col-md-4 profile-number">
-                            <h3>フォロー</h3>
+                            <h3>追随者</h3>
                             <a href="@routes.FollowingController.followingIndex(user.id)">@profileNumbers._2</a>
                         </div>
                         <div class="col-md-4 profile-number">
-                            <h3>フォロワー</h3>
+                            <h3>被追随者</h3>
                             <a href="@routes.FollowingController.followerIndex(user.id)">@profileNumbers._3</a>
                         </div>
                     </div>
@@ -44,7 +48,7 @@
                 <div class="col-md-6">
                     <div class="row">
                         <div class="col-md-10 col-md-offset-1 timeline-container">
-                        @form(routes.FirstPartController.create, 'role -> "form") {
+                        @form(routes.FirstPartController.create, 'role -> "form", 'id -> "firstPartForm") {
                             <fieldset>
                                 <div class="form-group tweet-form-top">
                                 @inputText(firstPartForm("firstPartContentFirst"), 'class -> "form-control", '_label -> null, 'placeholder -> "ガラス戸の", '_showConstraints -> false)
@@ -178,7 +182,7 @@
                         @form(routes.UserController.search, 'role -> "form") {
                             <fieldset>
                                 <div class="form-group tweet-form-top">
-                                @inputText(searchForm("username"), 'class -> "form-control", '_label -> null, 'placeholder -> "ユーザー名で検索する", '_showConstraints -> false)
+                                @inputText(searchForm("username"), 'class -> "form-control", '_label -> null, 'placeholder -> "歌人名で検索する", '_showConstraints -> false)
                                 </div>
                                 <div class="text-center">
                                     <input type="submit" value="検索" class="btn btn-blue900_rsd">
@@ -190,7 +194,7 @@
                     <div class="row timeline-container recommended-user-in-timeline">
                         <div class="row">
                             <div class="col-md-12">
-                                <spna class="recommended-user-title">あなたにおすすめのヨミビト</spna>
+                                <spna class="recommended-user-title">あなたにおすすめの歌人</spna>
                             </div>
                         </div>
                         @unfollowings.map { unfollowings =>
@@ -211,7 +215,7 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                 @helper.form(routes.FollowingController.create(unfollowings.id.toLong)) {
-                                                    <input type="submit" value="フォロー" class="btn btn-blue900_rsd btn-block">
+                                                    <input type="submit" value="追随する" class="btn btn-blue900_rsd btn-block">
                                                     }
                                                 </div>
                                             </div>

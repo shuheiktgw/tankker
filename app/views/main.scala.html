@@ -9,11 +9,78 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/jquery.validate.min.js")" type="text/javascript"></script>
         <link rel="stylesheet" media="screen" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
         <link rel="stylesheet" media="screen" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js" type="text/javascript"></script>
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/cb-materialbtn.min.css")">
         <link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $("#firstPartForm").validate({
+                    rules : {
+                        firstPartContentFirst: {
+                            required: true,
+                            minlength: 2,
+                            maxlength: 15
+                        },
+                        firstPartContentSecond: {
+                            required: true,
+                            minlength: 3,
+                            maxlength: 20
+                        },
+                        firstPartContentThird: {
+                            required: true,
+                            minlength: 2,
+                            maxlength: 15
+                        }
+                    },
+                    messages: {
+                        firstPartContentFirst: {
+                            required: "このフィールドの入力は必須です",
+                            minlength: "2文字以上入力してください",
+                            maxlength: "15文字以内で入力してください"
+                        },
+                        firstPartContentSecond: {
+                            required: "このフィールドの入力は必須です",
+                            minlength: "3文字以上入力してください",
+                            maxlength: "20文字以内で入力してください"
+                        },
+                        firstPartContentThird: {
+                            required: "このフィールドの入力は必須です",
+                            minlength: "2文字以上入力してください",
+                            maxlength: "15文字以内で入力してください"
+                        }
+                    }
+                });
+                $("#lastPartForm").validate({
+                    rules : {
+                        lastPartContentFirst: {
+                            required: true,
+                            minlength: 2,
+                            maxlength: 15
+                        },
+                        lastPartContentSecond: {
+                            required: true,
+                            minlength: 3,
+                            maxlength: 20
+                        }
+                    },
+                    messages: {
+                        lastPartContentFirst: {
+                            required: "このフィールドの入力は必須です",
+                            minlength: "3文字以上入力してください",
+                            maxlength: "20文字以内で入力してください"
+                        },
+                        lastPartContentSecond: {
+                            required: "このフィールドの入力は必須です",
+                            minlength: "3文字以上入力してください",
+                            maxlength: "20文字以内で入力してください"
+                        }
+                    }
+                });
+            });
+    </script>
     </head>
 
     @if(title.equals("Tankker")){
@@ -45,7 +112,7 @@
                                 <a class="logout" href="@routes.LoginController.delete">ログアウト</a>
                             </li>
                             <li class="nav-item-right">
-                                <a class="logout" href="@routes.UserController.edit">ユーザー情報</a>
+                                <a class="logout" href="@routes.UserController.edit">歌人情報</a>
                             </li>
                         }
                     </ul>

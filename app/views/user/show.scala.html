@@ -1,7 +1,7 @@
 @(carrier: views.models.UserShowCarrier)(implicit messages: Messages, flash: Flash)
     @import helper._
 
-    @main("ユーザー詳細") {
+    @main("歌人詳細") {
         @flash.get("success").map { message =>
             <div class="alert alert-success" role="alert">
                 @message
@@ -33,15 +33,15 @@
                             </div>
                             <div class="row number-row">
                                 <div class="col-md-4 profile-number">
-                                    <h3>ツイート</h3>
+                                    <h3>短歌</h3>
                                     <a href="@routes.UserController.show(carrier.requestedUser.username)">@carrier.userNumbers._1</a>
                                 </div>
                                 <div class="col-md-4 profile-number">
-                                    <h3>フォロー</h3>
+                                    <h3>追随者</h3>
                                     <a href="@routes.FollowingController.followingIndex(carrier.requestedUser.id)">@carrier.userNumbers._2</a>
                                 </div>
                                 <div class="col-md-4 profile-number">
-                                    <h3>フォロワー</h3>
+                                    <h3>被追随者</h3>
                                     <a href="@routes.FollowingController.followerIndex(carrier.requestedUser.id)">@carrier.userNumbers._3</a>
                                 </div>
                             </div>
@@ -50,13 +50,13 @@
                         <div class="col-md-12">
                             @if(!carrier.isMyself && !carrier.isFollowing) {
                                 @helper.form(routes.FollowingController.create(carrier.requestedUser.id.toLong)) {
-                                    <input type="submit" value="フォロー" class="btn btn-blue900_rsd btn-block">
+                                    <input type="submit" value="追随する" class="btn btn-blue900_rsd btn-block">
                                 }
                             }
 
                             @if(!carrier.isMyself && carrier.isFollowing) {
                                 @helper.form(routes.FollowingController.delete(carrier.requestedUser.id.toLong)) {
-                                    <input type="submit" value="フォローを解除" class="btn btn-blue900_rsd btn-block">
+                                    <input type="submit" value="追随を解除" class="btn btn-blue900_rsd btn-block">
                                     }
                             }
                         </div>
@@ -196,7 +196,7 @@
                         <div class="row timeline-container">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <spna class="recommended-user-title">あなたにおすすめのヨミビト</spna>
+                                    <spna class="recommended-user-title">あなたにおすすめの歌人</spna>
                                 </div>
                             </div>
                         @carrier.unfollowingUsers.map { unfollowingUser =>
@@ -217,7 +217,7 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     @helper.form(routes.FollowingController.create(unfollowingUser.id.toLong)) {
-                                                        <input type="submit" value="フォロー" class="btn btn-blue900_rsd btn-block">
+                                                        <input type="submit" value="追随する" class="btn btn-blue900_rsd btn-block">
                                                         }
                                                 </div>
                                             </div>

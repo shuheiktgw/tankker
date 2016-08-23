@@ -54,7 +54,7 @@
                     <div class="col-md-8 col-md-offset-2">
                         <div class="row tweet-top">
                             <div class="col-md-10 col-md-offset-1 timeline-container">
-                            @form(routes.LastPartController.create(user.id, firstPart.id), 'role -> "form") {
+                            @form(routes.LastPartController.create(user.id, firstPart.id), 'role -> "form",'id -> "lastPartForm") {
                                 <fieldset>
                                     <div class="form-group tweet-form-top">
                                     @inputText(lastPartForm("lastPartContentFirst"), 'class -> "form-control", '_label -> null, 'placeholder -> "ランプのかげの", '_showConstraints -> false)

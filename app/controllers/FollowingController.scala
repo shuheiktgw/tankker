@@ -17,7 +17,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   */
 class FollowingController @Inject()(val followingService: FollowingService, firstPartRepo: FirstPartRepo, val userServiceLike: UserServiceLike, val messagesApi: MessagesApi) extends Controller with I18nSupport with OptionalAuthElement with AuthConfigImpl{
 
-  // TODO これ他のユーザーのフォロー状況見れるように,username引数に取ろう
+  // TODO これ他の歌人の追随状況見れるように,username引数に取ろう
   def followingIndex(userId: Long) = AsyncStack{ implicit rs =>
     loggedIn match{
       case Some(user) => {
@@ -29,7 +29,7 @@ class FollowingController @Inject()(val followingService: FollowingService, firs
     }
   }
 
-  // TODO これ他のユーザーのフォロー状況見れるように,username引数に取ろう
+  // TODO これ他の歌人の追随状況見れるように,username引数に取ろう
   def followerIndex(userId: Long) = AsyncStack{ implicit rs =>
     loggedIn match{
       case Some(user) => {
@@ -43,7 +43,7 @@ class FollowingController @Inject()(val followingService: FollowingService, firs
     loggedIn match{
       case Some(user) => {
         val followingRow: Future[Tables.FollowingRow] = followingService.follow(user.id, followingUserId)
-        followingRow.map(_ => Redirect(routes.TimelineController.show).flashing("success" -> "フォローしました"))
+        followingRow.map(_ => Redirect(routes.TimelineController.show).flashing("success" -> "追随しました"))
       }
       case _ => Future(Redirect(routes.TimelineController.show).flashing("error" -> "Your request is not right."))
     }
@@ -52,7 +52,7 @@ class FollowingController @Inject()(val followingService: FollowingService, firs
   def delete(followingUserId: Long) = AsyncStack{ implicit  rs =>
     loggedIn match{
       case Some(user) =>{
-        followingService.unfollow(user.id, followingUserId).map(_ => Redirect(routes.TimelineController.show).flashing("success" -> "フォローを解除しました"))
+        followingService.unfollow(user.id, followingUserId).map(_ => Redirect(routes.TimelineController.show).flashing("success" -> "追随を解除しました"))
       }
       case _ => Future(Redirect(routes.TimelineController.show).flashing("error" -> "Your request is not right."))
     }
@@ -62,7 +62,7 @@ class FollowingController @Inject()(val followingService: FollowingService, firs
     // TODO フラグ立てしてブロック機能を実装できるようにしたい
     loggedIn match{
       case Some(user) =>{
-        followingService.unfollow(userId, user.id).map(_ => Redirect(routes.TimelineController.show).flashing("success" -> "ユーザーのフォローをブロックしました"))
+        followingService.unfollow(userId, user.id).map(_ => Redirect(routes.TimelineController.show).flashing("success" -> "歌人の追随をブロックしました"))
       }
       case _ => Future(Redirect(routes.TimelineController.show).flashing("error" -> "Your request is not right."))
     }

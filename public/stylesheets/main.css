@@ -314,6 +314,11 @@ a:hover img.tweet-icon{
     font-weight: 700;
 }
 
+/*following index*/
+.error{
+    color: #5f0e0e;
+}
+
 
 /*following index*/
 .following-index{

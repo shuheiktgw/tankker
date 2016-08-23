@@ -33,7 +33,7 @@ class TimelineRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) exten
     Following.filter(_.followingUserId === userId.toInt).length.result
   }
 
-  //TODO こここれだと自分をフォローしているユーザーが一人もいないと自分のTweetも表示されないので必ず対応する
+  //TODO こここれだと自分を追随している歌人が一人もいないと自分のTweetも表示されないので必ず対応する
   def fetchTweetForTimeline(userId: Long) = {
     Following
       .filter(following => following.userId === userId.toInt)
@@ -46,7 +46,8 @@ class TimelineRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) exten
       .joinLeft(User)
       .on{case((((following,firstUser), firstPart), lastPart), lastUser) => lastPart.map(_.userId === lastUser.id)}
       .map{case((((following,firstUser), firstPart), lastPart), lastUser) => ((firstPart, firstUser), lastPart, lastUser)}
-      .result
+      .sortBy{case ((firstPart, firstUser), lastPart, lastUser) => firstPart.map(_.createdAt).desc}
+        .result.map(_.take(30))
   }
 }
 

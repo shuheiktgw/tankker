@@ -19,11 +19,11 @@ class FirstPartRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) exte
   val FirstPart = TableQuery[FirstPart]
 
   def findByUserId(userId: Long): Future[Seq[Tables.FirstPartRow]] ={
-    db.run(FirstPart.filter(_.userId === userId.toInt).sortBy(_.createdAt.desc).result)
+    db.run(FirstPart.filter(_.userId === userId.toInt).sortBy(_.createdAt.desc).result.map(_.take(20)))
   }
 
   def findByUserIds(userIds: Seq[Int]): Future[Seq[Tables.FirstPartRow]] = {
-    db.run(FirstPart.filter(_.userId inSetBind userIds).sortBy(_.createdAt.desc).result)
+    db.run(FirstPart.filter(_.userId inSetBind userIds).sortBy(_.createdAt.desc).result.map(_.take(20)))
   }
 
   def findByID(id: Long): Future[Option[Tables.FirstPartRow]] = {

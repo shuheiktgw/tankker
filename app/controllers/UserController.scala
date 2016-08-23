@@ -29,19 +29,14 @@ import scala.concurrent.{Await, Future}
 class UserController @Inject()(val userService: UserService, val userServiceLike: UserServiceLike, val firstPartRepo: FirstPartRepo, val followingRepo: FollowingRepo, val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with OptionalAuthElement with AuthConfigImpl{
 
   // TODO Admin権限に設定
-  // TODO FLGがtrue のユーザーがログイン出来ないようにしなくてはいけない
-  def index = Action.async{ implicit rs =>
-    userService.getAll.map{ users =>
-      Ok(views.html.user.index(users))
-    }
-  }
+  // TODO FLGがtrue の歌人がログイン出来ないようにしなくてはいけない
 
   def show(username: String) = AsyncStack { implicit rs =>
       loggedIn match {
         case Some(currentUser) => {
           userService.fetchUserData(currentUser, username) map{
             case Some(carrier) => Ok(views.html.user.show(carrier))
-            case _ => Redirect(routes.TimelineController.show).flashing("error" -> "指定されたユーザー名は存在しません")
+            case _ => Redirect(routes.TimelineController.show).flashing("error" -> "指定された歌人名は存在しません")
           }
         }
         case _ => Future(Redirect(routes.LoginController.brandNew))
@@ -56,17 +51,17 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
   }
 
 
-  //TODO ユーザー名前のバリデーションを行う
+  //TODO 歌人名前のバリデーションを行う
   def create = AsyncStack{ implicit rs =>
     userForm.bindFromRequest.fold(
-      error => {
-        Future(Redirect(routes.UserController.brandNew).flashing("error" -> "新規作成フォームに入力された値が正しくありません"))
+      formWithError => {
+        Future(BadRequest(views.html.user.register(formWithError)))
       },
       form =>{
         val user = UserRow(0,form.username,form.email,form.password,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
         userService.add(user).flatMap {
           case Some(user) => gotoLoginSucceeded(user.username).map(_.flashing("success" -> "Tankkerへようこそ!"))
-          case _ => Future(Redirect(routes.UserController.brandNew).flashing("error" -> "Emailもしくはユーザー名が既に存在しています"))
+          case _ => Future(Redirect(routes.UserController.brandNew).flashing("error" -> "Emailもしくは歌人名が既に存在しています"))
         }
       }
     )
@@ -88,7 +83,7 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
   def update = AsyncStack{ implicit rs =>
     userEditForm.bindFromRequest.fold(
       error => {
-        Future(Redirect(routes.UserController.edit).flashing("error" -> "ユーザー情報に誤った値が含まれています"))
+        Future(Redirect(routes.UserController.edit).flashing("error" -> "歌人情報に誤った値が含まれています"))
       },
       form =>{
         loggedIn match{
@@ -96,7 +91,7 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
             val hasPasswordChanged: Boolean = !form.password.isEmpty && !(form.password == null)
             val user = UserRow(currentUuser.id,currentUuser.username,form.email, form.password ,false, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))
             userService.change(user, hasPasswordChanged).map { _ =>
-              Redirect(routes.TimelineController.show).flashing("success" -> "ユーザー情報を更新しました")
+              Redirect(routes.TimelineController.show).flashing("success" -> "歌人情報を更新しました")
             }
           }
           case _ => Future(Redirect(routes.LoginController.brandNew))
@@ -109,7 +104,7 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
   def delete = AsyncStack { implicit rs =>
     loggedIn match{
       case Some(user) => userService.remove(user.id) map{
-        // TODO 削除したユーザーの情報をFlashで表示
+        // TODO 削除した歌人の情報をFlashで表示
         // 削除する前に確認
         case Some(user) => Redirect(routes.LoginController.brandNew).flashing("success" -> "ログアウトしました")
         case None => Redirect(routes.LoginController.brandNew)
@@ -128,7 +123,7 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
           case Some(currentUser) => {
             userService.findByUsername(form.username) map {
               case Some(user) => Redirect(routes.UserController.show(form.username)).flashing("success" -> s"${form.username}のページに移動しました")
-              case _ => Redirect(routes.TimelineController.show).flashing("error" -> "入力されたユーザー名は存在しません")
+              case _ => Redirect(routes.TimelineController.show).flashing("error" -> "入力された歌人名は存在しません")
             }
           }
           case _ => Future(Redirect(routes.LoginController.brandNew))
@@ -142,7 +137,7 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
       case Some(currentUser) => {
         userService.fetchUserDataForHenkas(currentUser, username) map{
           case Some(carrier) => Ok(views.html.user.henkas(carrier))
-          case _ => Redirect(routes.TimelineController.show).flashing("error" -> "指定されたユーザー名は存在しません")
+          case _ => Redirect(routes.TimelineController.show).flashing("error" -> "指定された歌人名は存在しません")
         }
       }
       case _ => Future(Redirect(routes.LoginController.brandNew))

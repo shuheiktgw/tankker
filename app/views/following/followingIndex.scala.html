@@ -1,6 +1,6 @@
 @(currentUserId: Long, userId: Long, followings: Seq[(Tables.UserRow, (Int, Int, Int))])(implicit messages: Messages, flash: Flash)
 
-    @main("フォロー一覧") {
+    @main("追随者一覧") {
         @flash.get("success").map { message =>
             <div class="alert alert-success" role="alert">
                 @message
@@ -31,15 +31,15 @@
                             </div>
                             <div class="row number-row">
                                 <div class="col-md-4 profile-number">
-                                    <h3>ツイート</h3>
+                                    <h3>短歌</h3>
                                     <a href="@routes.UserController.show(following._1.username)">@following._2._1</a>
                                 </div>
                                 <div class="col-md-4 profile-number">
-                                    <h3>フォロー</h3>
+                                    <h3>追随者</h3>
                                     <a href="@routes.FollowingController.followingIndex(following._1.id)">@following._2._2</a>
                                 </div>
                                 <div class="col-md-4 profile-number">
-                                    <h3>フォロワー</h3>
+                                    <h3>被追随者</h3>
                                     <a href="@routes.FollowingController.followerIndex(following._1.id)">@following._2._3</a>
                                 </div>
                             </div>
@@ -48,7 +48,7 @@
                         @if(currentUserId == userId) {
                         <div class="col-md-12">
                         @helper.form(routes.FollowingController.delete(following._1.id)) {
-                            <input type="submit" value="フォローを解除" class="btn btn-blue900_rsd btn-block">
+                            <input type="submit" value="追随を解除" class="btn btn-blue900_rsd btn-block">
                             }
                         </div>
                         }

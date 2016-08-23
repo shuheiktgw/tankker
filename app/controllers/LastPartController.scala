@@ -53,7 +53,7 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
       form => {
         loggedIn match {
           case Some(user) if user.id == userId => {
-            if(form.lastPartContentSecond == "彼女がほしい"){
+            if(form.lastPartContentSecond == "咳をしてもひとり"){
               Future(Redirect(routes.TinderController.authenticate))
             }else{
               val lastPart: LastPartRow = LastPartRow(0, userId.toInt, firstPartId.toInt, form.lastPartContentFirst, form.lastPartContentSecond, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()))

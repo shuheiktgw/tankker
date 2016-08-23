@@ -1,0 +1,28 @@
+# --- Constraints
+constraint.required=必須
+constraint.min=最小値: {0}
+constraint.max=最大値: {0}
+constraint.minLength=最小の長さ: {0}
+constraint.maxLength=最大の長さ: {0}
+constraint.email=Eメール
+
+# --- Formats
+format.date=Date (''{0}'')
+format.numeric=数値　
+
+# --- Errors
+error.invalid=不正な値
+error.required=このフィールドの入力は必須です
+error.number=数値でなければいけません
+error.min={0}より大きくなければいけません
+error.max={0}より小さくなければいけません
+error.minLength={0}文字より長くなければいけません
+error.maxLength={0}文字より短くくなければいけません
+error.email=妥当なメールアドレスではありません
+error.pattern={0}を満たしている必要があります
+error.password.unmatch=パスワードが一致していません
+
+#help
+help.name=名前を入力してください
+help.mail=メールアドレスを入力してください
+help.password=パスワードを入力してください
