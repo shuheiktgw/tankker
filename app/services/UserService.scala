@@ -123,7 +123,7 @@ class UserService @Inject()(val dbConfigProvider: DatabaseConfigProvider, val us
         fetchTankasForUserPage(requestedUser.id) flatMap { tankas =>
           profileNumbers flatMap { numbers =>
             futureIsFollowing flatMap { isFollowing =>
-              fetchUnfollowingUsers(currentUser.id).map{ unfollowedUsers =>
+              fetchNotfollowingUsers(currentUser.id).map{ unfollowedUsers =>
                 val carrier: UserShowCarrier = UserShowCarrier(currentUser, requestedUser, firstPartForm, numbers, tankas, isMyself, isFollowing, unfollowedUsers)
                 Some(carrier)
               }
@@ -155,7 +155,7 @@ class UserService @Inject()(val dbConfigProvider: DatabaseConfigProvider, val us
         fetchHenkasForUserpage(requestedUser.id) flatMap { henkas =>
           profileNumbers flatMap { numbers =>
             futureIsFollowing flatMap { isFollowing =>
-              fetchUnfollowingUsers(currentUser.id).map{ unfollowedUsers =>
+              fetchNotfollowingUsers(currentUser.id).map{ unfollowedUsers =>
                 val carrier: UserHenkasCarrier = UserHenkasCarrier(currentUser, requestedUser, firstPartForm, numbers, henkas, isMyself, isFollowing, unfollowedUsers)
                 Some(carrier)
               }
@@ -171,7 +171,7 @@ class UserService @Inject()(val dbConfigProvider: DatabaseConfigProvider, val us
   }
 
 
-  def fetchUnfollowingUsers(userId: Long): Future[Seq[Tables.UserRow]] = {
+  def fetchNotfollowingUsers(userId: Long): Future[Seq[Tables.UserRow]] = {
     db.run(userRepo.fetchUnfollowingUsers(userId))
   }
 }

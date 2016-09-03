@@ -29,7 +29,6 @@ import scala.concurrent.{Await, Future}
 class UserController @Inject()(val userService: UserService, val userServiceLike: UserServiceLike, val firstPartRepo: FirstPartRepo, val followingRepo: FollowingRepo, val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with OptionalAuthElement with AuthConfigImpl{
 
   // TODO Admin権限に設定
-  // TODO FLGがtrue の歌人がログイン出来ないようにしなくてはいけない
 
   def show(username: String) = AsyncStack { implicit rs =>
       loggedIn match {
@@ -43,15 +42,11 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
     }
   }
 
-  // TODO テスト書く
-  // TODO メソッド名変更
   import UserController._
   def brandNew = Action.async{ implicit rs =>
     Future(Ok(views.html.user.register(userForm)))
   }
 
-
-  //TODO 歌人名前のバリデーションを行う
   def create = AsyncStack{ implicit rs =>
     userForm.bindFromRequest.fold(
       formWithError => {
@@ -100,12 +95,9 @@ class UserController @Inject()(val userService: UserService, val userServiceLike
     )
   }
 
-  // TODO HTTPリクエストのメソッドをDeleteでRootを/userに変更
   def delete = AsyncStack { implicit rs =>
     loggedIn match{
       case Some(user) => userService.remove(user.id) map{
-        // TODO 削除した歌人の情報をFlashで表示
-        // 削除する前に確認
         case Some(user) => Redirect(routes.LoginController.brandNew).flashing("success" -> "ログアウトしました")
         case None => Redirect(routes.LoginController.brandNew)
       }

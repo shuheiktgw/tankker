@@ -78,7 +78,6 @@ class UserRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends H
       .result.map(_.take(30))
   }
 
-
   def fetchUnfollowingUsers(userId: Long): DBIO[Seq[Tables.UserRow]] = {
     Following
       .filter(_.userId === userId.toInt)

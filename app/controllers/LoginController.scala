@@ -30,7 +30,7 @@ class LoginController @Inject()(val userServiceLike: UserServiceLike, val messag
       form => {
         userServiceLike.authenticate(form).flatMap {
           case Some(user) => gotoLoginSucceeded(user.username).map(_.flashing("success" -> "ログインに成功しました"))
-          case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "歌人名もしくはアイコトバに間違いがあります"))
+          case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "歌人名もしくはパスワードに間違いがあります"))
         }
       }
     )

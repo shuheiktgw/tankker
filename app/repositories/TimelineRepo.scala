@@ -33,7 +33,6 @@ class TimelineRepo @Inject()(val dbConfigProvider: DatabaseConfigProvider) exten
     Following.filter(_.followingUserId === userId.toInt).length.result
   }
 
-  //TODO こここれだと自分を追随している歌人が一人もいないと自分のTweetも表示されないので必ず対応する
   def fetchTweetForTimeline(userId: Long) = {
     Following
       .filter(following => following.userId === userId.toInt)

@@ -12,24 +12,23 @@ import services.{TimelineService, UserService, UserServiceLike}
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import controllers.FirstPartController.firstPartForm
+import controllers.UserController.searchForm
+
 /**
   * Created by shuhei.kitagawa on 2016/08/09.
   */
 class TimelineController @Inject()(val timelineService: TimelineService,val userService: UserService, val userServiceLike: UserServiceLike, val messagesApi: MessagesApi) extends Controller with I18nSupport with LoginLogout with OptionalAuthElement with AuthConfigImpl{
 
-  import controllers.FirstPartController.firstPartForm
-  import controllers.UserController.searchForm
-
   def show = AsyncStack{ implicit rs =>
     loggedIn match{
       case Some(user) =>{
-        val futureTankas: Future[Seq[((Option[Tables.FirstPartRow], Tables.UserRow), Seq[(Option[Tables.LastPartRow], Option[Tables.UserRow])])]] = timelineService.fetchTankasForTL(user.id)
-        futureTankas.flatMap{ tankas =>
-          timelineService.fetchProfileNumbers(user.id) flatMap{ profileNumbers =>
-            userService.fetchUnfollowingUsers(user.id) map {unfollowings =>
-              Ok(views.html.timeline.show(user, firstPartForm, tankas, searchForm, profileNumbers, unfollowings))
-            }
-          }
+        for{
+          tankas <- timelineService.fetchTankasForTL(user.id)
+          numbers <- timelineService.fetchProfileNumbers(user.id)
+          notFollowingUsers <- userService.fetchNotfollowingUsers(user.id)
+        } yield {
+          Ok(views.html.timeline.show(user, firstPartForm, tankas, searchForm, numbers, notFollowingUsers))
         }
       }
       case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "セッションがタイムアウトしました"))
