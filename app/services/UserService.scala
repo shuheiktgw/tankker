@@ -44,7 +44,7 @@ class UserService @Inject()(val dbConfigProvider: DatabaseConfigProvider, val us
       case true => Future(Option.empty[Tables.UserRow])
       case _ => {
         val encryptedUser: UserRow = user.copy(password = user.password.bcrypt)
-        accessDbToInsert(encryptedUser).map(_ => Option(user))
+        accessDbToInsert(encryptedUser).map(_ => Option(encryptedUser))
       }
     }
   }
