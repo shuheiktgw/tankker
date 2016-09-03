@@ -34,10 +34,10 @@ class LastPartController @Inject()(val firstPartRepo: FirstPartRepo, val lastPar
             val firstPartOwner: Future[Option[Tables.UserRow]] = userService.findById(firstPart.userId)
             firstPartOwner.map{
               case Some(owner) => Ok(views.html.lastPart.brandNew(user, lastPartForm, firstPart, owner))
-              case _ => Redirect(routes.TimelineController.show).flashing("error" -> "The Tanka does not exists...")
+              case _ => Redirect(routes.TimelineController.show).flashing("error" -> "指定された短歌は存在しません")
             }
           }
-          case _ => Future(Redirect(routes.TimelineController.show).flashing("error" -> "The Tanka does not exists..."))
+          case _ => Future(Redirect(routes.TimelineController.show).flashing("error" -> "指定された短歌は存在しません"))
         }
       }
       case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
@@ -126,7 +126,6 @@ object LastPartController {
   case class LastPartForm(lastPartContentFirst: String, lastPartContentSecond: String)
 
   val lastPartForm = Form(
-    // TODO フォームのバリデーションの追加
     mapping(
       "lastPartContentFirst" -> nonEmptyText(3, 17),
       "lastPartContentSecond" -> nonEmptyText(3, 17)

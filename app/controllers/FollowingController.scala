@@ -17,19 +17,16 @@ import scala.concurrent.ExecutionContext.Implicits.global
   */
 class FollowingController @Inject()(val followingService: FollowingService, firstPartRepo: FirstPartRepo, val userServiceLike: UserServiceLike, val messagesApi: MessagesApi) extends Controller with I18nSupport with OptionalAuthElement with AuthConfigImpl{
 
-  // TODO これ他の歌人の追随状況見れるように,username引数に取ろう
   def followingIndex(userId: Long) = AsyncStack{ implicit rs =>
     loggedIn match{
       case Some(user) => {
         val followings: Future[Seq[(Tables.UserRow, (Int, Int, Int))]] = followingService.fetchFollowings(userId)
-        // TODO follwingとfollowerでテンプレートを共通化できないか検討する
         followings.map(followings => Ok(views.html.following.followingIndex(user.id, userId, followings)))
       }
       case _ => Future(Redirect(routes.LoginController.brandNew).flashing("error" -> "Goodbye bad boy..."))
     }
   }
 
-  // TODO これ他の歌人の追随状況見れるように,username引数に取ろう
   def followerIndex(userId: Long) = AsyncStack{ implicit rs =>
     loggedIn match{
       case Some(user) => {
