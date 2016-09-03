@@ -44,12 +44,16 @@ class UserService @Inject()(val dbConfigProvider: DatabaseConfigProvider, val us
       case true => Future(Option.empty[Tables.UserRow])
       case _ => {
         val encryptedUser: UserRow = user.copy(password = user.password.bcrypt)
-        db.run(userRepo.add(encryptedUser)).map(_ => Option(user))
+        accessDbToInsert(encryptedUser).map(_ => Option(user))
       }
     }
   }
 
-  def userExists(user: Tables.UserRow): Future[Boolean] = {
+  protected def accessDbToInsert(user: Tables.UserRow) = {
+    db.run(userRepo.add(user))
+  }
+
+  protected def userExists(user: Tables.UserRow): Future[Boolean] = {
     val futureResult: Future[Option[Tables.UserRow]] = db.run(userRepo.userExists(user))
     futureResult.map(_.isDefined)
   }
